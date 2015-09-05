@@ -16,13 +16,13 @@
 <body class="list">
   <!-- Header in overview -->
   <header class="caption">
-    <h1>Aiohttp Usage</h1>
+    <h1>Chinese Search Sharing</h1>
     <p style="line-height: 32px; padding-top:15px;"><a href="http://liang2.tw">Liang Bo Wang (亮亮)</a>, 2015-07-14</p>
   </header>
   <!-- Cover slide -->
   <section id="cover" class="slide cover w"><div>
-    <h3 id="talk-subheader">Python Web Meetup, 2015-07-14</h3>
-    <h2 id="talk-header" class="place">Aiohttp Usage</h2>
+    <h3 id="talk-subheader">MLDM Monday, 2015-09-14</h3>
+    <h2 id="talk-header" class="place">中文搜尋經驗分享</h2>
     <p id="talk-author">
       By <a href="http://liang2.tw" target="_blank">Liang<sup>2</sup></a> under CC 4.0 BY license
     </p>
@@ -34,22 +34,24 @@
   </div>
   <style>
     #talk-header {
-      color: #D91A3C;
+      color: #EEE;
+      text-shadow: 0px 0px 5px black;
       text-align: center;
-      font-size: 120px;
+      font-size: 110px;
       line-height: 1.2em;
-      opacity: 0.8;
+      opacity: 1;
       position: relative;
-      top: -20px;
+      top: 60px;
       width: 120%;
     }
     #talk-subheader {
-      color: #0376A6;
+      color: #E9FFDA;
+      text-shadow: 0px 0px 2px black;
       text-align: center;
-      font-size: 32px;
-      opacity: 0.3;
+      font-size: 36px;
+      opacity: 1;
       position: relative;
-      top: -90px;
+      top: -20px;
     }
     #talk-author {
       position: relative;
@@ -57,7 +59,7 @@
       text-shadow: 1px 1px 3px #000;
     }
     #talk-author {
-      top: -20px;
+      top: 0px;
     }
     #talk-author a {
       color: #FFFA20;
@@ -67,7 +69,7 @@
       text-align: center;
       color: #FFF;
       font-size: 32px;
-      opacity: 0.8;
+      opacity: 1;
     }
     #usage-instr {
       position: absolute;
@@ -77,7 +79,7 @@
     }
     #usage-instr kbd {
       opacity: 0.8;
-      color: #D91A3C;
+      color: #784639;
       background-color: white;
     }
     #cover .src-link {
@@ -88,21 +90,20 @@
       right: 10px;
     }
     #cover img {
-      opacity: 1;
+      opacity: 0.85;
     }
   </style>
   </section>
 
   <section id="about-me" class="slide"><div>
-      <h2>About Me</h2>
+      <h2>關於我</h2>
       <ul>
-        <li>R / Python</li>
-        <li>PyCon APAC 2014-16/TW staff<br>
-          We're calling for <strong>reviewers</strong></li>
-        <li>NTU Bioinfo master student</li>
+        <li>會說一些 R 和 Python</li>
+        <li>PyCon TW 2016 議程組：誠徵<strong class="pinkoi">志工</strong>！！</li>
+        <li>NTU Bioinfo master student<br>歡迎找我聊我的研究題目</li>
         <li>Former intern at Microsoft Research Asia</li>
         <li>Intern at <strong><a href="http://www.pinkoi.com/about" class="pinkoi">Pinkoi</a></strong></li>
-        <li>Happy to chat about bioinfo <del>and anime</del></li>
+        <li>此人偏宅，但今天不一定有宅梗</li>
       </ul>
       <img id="protrait" src="pics/me.jpg" class="place r"alt="">
     </div>
@@ -111,445 +112,23 @@
         margin-right: 120px;
         width: 300px;
       }
+      #about-me ul {
+        width: 60%;
+      }
     </style>
   </section>
 
-  <section id="background" class="slide"><div>
-    <h2>這幾天在分析 ElasticSearch 結果</h2>
-    <ul class="tighter">
-      <li>他可以當成一個 RESTful API，餵個字串就會回傳搜尋結果</li>
-      <li>總之要一直 GET 他</li>
-      <li>因為要做 benchmark，所以要 GET 很多次</li>
-      <li class="next">真的很多次，大概幾十萬次</li>
-    </ul>
-    <p class="tighter next">雖然 ES 很快一個 query 約 15ms，十萬次也要半個小時。<del>耍廢半小時？</del></p>
-    <p class="tighter next">所以想到用個非同步打 ES 好了。<span class="next">mutlithreading / async?</span></p>
-  </div></section>
-
-  <section id="multithread" class="slide"><div>
-      <pre class="language-python tighter">
-        <code>from concurrent.futures import ThreadPoolExecutor
-
-def search(query, url='/search'):
-    r = requests.request('GET', url, params={'q': query})
-    quote_json = r.json()
-    return quote_json
-
-with ThreadPoolExecutor(max_workers) as executor:
-    results = executor.map(search, all_queries)</code>
-      </pre>
-      <div class="sidenote grey">
-        <p>For Python 2.7, <a class="grey" href="https://pypi.python.org/pypi/futures">futures</a> is the backport package for concurrent.futures</p>
-      </div>
-    </div>
-    <style>
-    #multithread .sidenote h3 {
-      font-size: 1.3em;
-    }
-    #multithread .sidenote {
-      position: absolute;
-      width: 360px;
-      right: 80px;
-      top: 145px;
-      line-height: 1.5em;
-      font-size: 20px;
-    }
-    </style>
-  </section>
-
-  <section id="multithread-contd" class="slide"><div>
-    <h2>Multithreading 不夠潮</h2>
-    <ul>
-      <li>用起來應該沒問題，<a href="https://docs.python.org/3.4/library/concurrent.futures.html#concurrent.futures.ThreadPoolExecutor">官網也是用網路爬蟲當例子</a></li>
-      <li>不過身為一個<del>（一直出包）</del>不斷實驗改進的工程師，還蠻常活在 REPL / IPython Notebook 裡，印象中 threading、multiprocessing 在這情況<a href="https://docs.python.org/3.4/library/multiprocessing.html#using-a-pool-of-workers">可能會噴 error</a>（雖然我沒有測啦）</li>
-      <li>廢話這多，總之想試 async，多點些技能</li>
-      <li>async 版的 requests 就是 <a href="https://aiohttp.readthedocs.org/en/stable/">aiohttp</a></li>
-    </ul>
-  </div></section>
-
-  <section id="asyncio" class="slide"><div>
-    <h2>Event loop / asyncio 是啥？可以吃嗎？</h2>
-    <ul>
-      <li>可以直接吃，但你會投降 <a class="grey" href="https://www.youtube.com/watch?v=H2KYzeT_lGY">Stop, I yield!</a><span class="grey">（冰火粉覺得好冷）</span></li>
-      <li>我也是看報紙才知道的。看了</li>
-       <ul>
-        <li>TP 大大 <em>Yield a Tulip</em> <a href="https://speakerdeck.com/uranusjr/yield">投影片</a>（<a href="http://www.pyvideo.org/video/3263/yielding-a-tulip-pycon-apac-2014">影片</a>）</li>
-        <li>David Beazley <a href="https://www.youtube.com/watch?v=MCs5OvhV9S4">現場刻一個</a> (<a href="https://github.com/dabeaz/concurrencylive">source code</a>)
-        <br><em>Python Concurrency From the Ground Up</em></li>
-        <li>從 <a href="http://asyncio.org/">asyncio 大本營</a>看了<a href="http://sahandsaba.com/understanding-asyncio-node-js-python-3-4.html">有的</a><a href="http://compiletoi.net/fast-scraping-in-python-with-asyncio.html">沒的</a><a href="http://ntoll.org/article/asyncio">大大</a>小小教學</li>
-        <li>…（然後進入精神時光屋差不多幾個月）</li>
-      </ul>
-      <li>就會了呢</li>
-    </ul>
-  </div></section>
-
-  <section id="scene" class="slide"><div>
-    <h2>情境測試：Random Quoter</h2>
-    <ul class="tighter">
-      <li>用 Tornado 寫了個 server （用它自己的 event loop）</li>
-      <li><code>http://localhost:5566/quote</code> 就會回傳 1984 隨機段落<br>
-        但它反應太快了 <code>?slow=true</code> 強制加 0.5 秒</li>
-      <li><code>/quote?part=1&amp;chapter=2</code> 可以選段落章節抽樣</li>
-      <li><code>/quote/uniform</code> 確保每個段落機率是一致的（統計強迫症）</li>
-    </ul>
-    <pre class="language-bash"><code>python 0_parse_1984.py
-python random_quote_app.py [--help|--num_process=1]</code></pre>
-  </div></section>
-
-<!--",  Then we control the past, do we not?'" part3 chp2-->
-  <section id="scene-in-action" class="slide"><div>
-    <p class="tighter">用起來大概像這樣</p>
-    <pre class="medium language-bash"><code class="language-bash">$ curl -s -XGET "http://localhost:5566/quote" | \
-  python -m json.tool  # prettify
-{
-    "quote": "   WAR IS PEACE   FREEDOM IS SLAVERY
-                 IGNORANCE IS STRENGTH",
-    "source": {
-        "chapter": 1,
-        "part": 1
-    }
-}</code></pre>
-  </div></section>
-
-  <section id="scene-in-action-slow" class="slide"><div>
-    <pre class="medium language-bash"><code class="language-bash">
-$ curl -s -XGET "localhost:5566/quote/uniform<mark>?slow=true&amp;part=3</mark>"
-# pause for 500ms then return
-{
-    "quote": "'In memory. Very well, then. We, the Party,
-              control all records, and we control all memories.
-              Then we control the past, do we not?'",
-    "source": {
-        "chapter": 2,
-        "part": 3
-    }
-}</code></pre>
-
-
-  </div></section>
-  <section id="asyncio-basic-cover" class="slide cover w subheader"><div>
-      <h2>Asycnio (http)<br>Basics</h2>
+  <section id="mid-cover" class="slide cover w subheader mid"><div>
+      <h2>Test Cover</h2>
       <img src="pics/mid.jpg" alt="">
     </div>
   </section>
 
-  <section id="min-aiohttp-example" class="slide"><div>
-    <h2>最基本 asyncio 架構：一個 coroutine</h2>
-    <pre class="language-python"><code>@asyncio.coroutine
-def quote_simple(url='/quote/uniform'):
-    r = yield from aiohttp.request('GET', url)
-    quote_json = yield from r.json()
-    return quote_json['quote']
-
-loop = asyncio.get_event_loop()
-quote = loop.run_until_complete(quote_simple())</code></pre>
-    <div class="sidenote next">
-      <h3 class="grey"><strong>About coroutines</strong></h3>
-      <p class="tighter">Coroutines can be entered, exited, and resumed <strong>at many different points</strong></p>
+  <section id="mid2-cover" class="slide cover w subheader mid2"><div>
+      <h2>中間標題測試</h2>
+      <img src="pics/mid2.jpg" alt="">
     </div>
-    <style>
-      #min-aiohttp-example .sidenote h3 {
-        font-size: 1.2em;
-      }
-      #min-aiohttp-example .sidenote p {
-        margin-bottom: 5px;
-        line-height: 1.5em;
-      }
-      #min-aiohttp-example .sidenote {
-        position: absolute;
-        width: 260px;
-        right: 120px;
-        bottom: 120px;
-        font-size: 16px;
-        padding: 0 10px;
-        border: dotted 1px grey;
-      }
-    </style>
-  </div></section>
-
-  <section id="sync-http-requests" class="slide"><div>
-  <h2>本來使用 requests 長這樣</h2>
-<pre class="language-python"><code>
-def quote_block(url='/quote/uniform'):
-    r = requests.request('GET', url)
-    quote_json = r.json()
-    return quote_json['quote']
-
-
-quote = quote_block()</code></pre>
-    <div class="sidenote">
-      <h3 class="grey"><strong>Note</strong></h3>
-      <ul>
-        <li>requests 中比較常用 <code>requests.get(...)</code></li>
-        <li>aiohttp 0.17+ 會有對應 <code>aiohttp.get(...)</code></li>
-      </ul>
-    </div>
-    <style>
-      #sync-http-requests .sidenote h3 {
-        font-size: 1.3em;
-      }
-      #sync-http-requests .sidenote {
-        position: absolute;
-        width: 250px;
-        right: 100px;
-        bottom: -20px;
-        font-size: 22px;
-      }
-    </style>
-  </div></section>
-
-  <section id="min-aiohttp-example-annotated" class="slide"><div>
-    <h2>最基本 asyncio 架構：一個 coroutine</h2>
-    <pre class="language-python"><code><mark>@asyncio.coroutine</mark>
-def quote_simple(url='/quote/uniform'):
-    r = <mark>yield from</mark> aiohttp.request('GET', url)
-    quote_json = <mark>yield from</mark> r.json()
-    return quote_json['quote']
-
-loop = asyncio.get_event_loop()
-quote = loop.run_until_complete(quote_simple())</code></pre>
-  </div></section>
-
-  <section id="min-aiohttp-example-loop" class="slide"><div>
-    <h2>最基本 asyncio 架構：一個 coroutine</h2>
-    <pre class="language-python"><code>@asyncio.coroutine
-def quote_simple(url='/quote/uniform'):
-    r = yield from aiohttp.request('GET', url)
-    quote_json = yield from r.json()
-    return quote_json['quote']
-
-loop = asyncio.get_event_loop()
-quote = <mark>loop.run_until_complete(quote_simple())</mark></code></pre>
-  </div></section>
-
-  <section id="min-aiohttp-example-explain" class="slide"><div>
-      <h2>Coroutine / Task</h2>
-      <ul>
-        <li><code>quote_simple()</code> 會回傳一個 coroutine（可以 yield from 它）</li>
-        <li><code>loop.run_until_complete(coro)</code> 會自動把 coroutine 用 <code>Task</code> (subclass of future) 包住，
-            並丟到 event loop 去執行</li>
-        <li><a class="pinkoi" href="https://docs.python.org/3.4/library/asyncio-task.html#asyncio.Task"><code>Task</code></a> 有很多好處：接 callback、看包的 coroutine 有沒有結束、記住回傳值、存 traceback</li>
-        <li>例：<code>t = Task(coro); loop.run_until_complete(t)</code><br>能有相同的作用</li>
-        <li>好處是 <code>t.result()</code> 能拿到 <code>coro</code> 回傳值</li>
-      </ul>
-  </div></section>
-
-  <section id="multi-coro-example" class="slide"><div>
-      <h2 class="tighter">多個 requests 情況</h2>
-      <p class="tighter">用 <a class="pinkoi" href="https://docs.python.org/3.4/library/asyncio-task.html#asyncio.gather"><code>asyncio.gather(*coro)</code></a>
-      同時放入多個 coroutines 進 loop，<br>等他們結束，並依序收集回傳值。
-      </p>
-      <pre class="language-python"><code>@asyncio.coroutine
-def quote_many(num_quotes=1):
-    coroutines = [
-        quote_simple() for i in range(num_quotes)
-    ]
-    quotes = yield from asyncio.gather(*coroutines)
-    return quotes</code></pre>
-  </div></section>
-
-  <section id="multi-coro-example-bad" class="slide"><div>
-      <h2 class="tighter">一發不可拾</h2>
-      <ul class="tighter">
-        <li><code>loop.run_until_complete(quote_many(2000))</code><br>表示一口氣發了 2000 個 request，會把人家打壞掉……</li>
-        <li>如果電腦沒調整，在那之前會先出現 <strong>ClientOSError</strong></li>
-        <li>Port 會先不夠用 <code>netstat -apn | grep 9527</code></li>
-      </ul>
-      <pre class="medium"><code>tcp 0 0   127.0.0.1:5566    127.0.0.1:45236  ESTABLISHED 5991/python
-tcp 0 0   127.0.0.1:45213   127.0.0.1:5566   ESTABLISHED 6680/python
-tcp 0 0   127.0.0.1:45168   127.0.0.1:5566   <mark>TIME_WAIT</mark>   -
-tcp 0 0   127.0.0.1:44763   127.0.0.1:5566   <mark>TIME_WAIT</mark>   -
-tcp 0 0   127.0.0.1:45772   127.0.0.1:5566   <mark>TIME_WAIT</mark>   -
-tcp 0 0   127.0.0.1:44741   127.0.0.1:5566   <mark>TIME_WAIT</mark>   -</code></pre>
-
-  </div></section>
-
-  <section id="multi-coro-example-bad-contd" class="slide"><div>
-      <h2>Cont'd</h2>
-      <ul>
-        <li>請參考<a href="http://vincent.bernat.im/en/blog/2014-tcp-time-wait-state-linux.html">詳細說明</a>和<a href="http://translate.google.com.tw/translate?hl=en&sl=ja&u=http://qiita.com/kuni-nakaji/items/c07004c7d9e5bb683bc2&prev=search">相關文章</a>調整 sysctl.conf 連線設定</li>
-        <li>實際上跑得很慢，2000 reqs (1 req = 0.5 sec) 需要 4.66 sec</li>
-        <li>很明顯地這沒有解決問題</li>
-        <li>就跟 multithreading 一樣，要<del>加裝拘束器</del>連線限制</li>
-        <li>aiohttp 其實可以設定 connection pool limit，但這莫名一直炸 / 噴 Exception。重點最後還是很慢，需要 3.94 sec</li>
-        <li class="next">自己寫。使用 <a class="pinkoi" href="https://docs.python.org/3.4/library/asyncio-sync.html#asyncio.Semaphore"><code>asyncio.Semaphore</code></a> （<a href="https://en.wikipedia.org/wiki/Semaphore_%28programming%29">維基說明</a>）</li>
-      </ul>
-  </div></section>
-
-  <section id="multi-coro-lock-example-before" class="slide"><div>
-      <h2>本來的 quote_simple</h2>
-      <pre class="language-python"><code>@asyncio.coroutine
-def quote_simple(url='/quote/uniform'):
-    r = yield from aiohttp.request('GET', url)
-    quote_json = yield from r.json()
-    return quote_json['quote']</code></pre>
-  </div></section>
-
-  <section id="multi-coro-lock-example" class="slide"><div>
-      <h2>Coroutine with Semaphore</h2>
-      <pre class="language-python"><code>@asyncio.coroutine
-def quote_with_lock(semaphore, url='/quote/uniform'):
-    <mark>with (yield from semaphore):</mark>
-        r = yield from aiohttp.request('GET', url)
-        quote_json = yield from r.json()
-    return quote_json['quote']</code></pre>
-      <p class="tighter"><code>with ...</code> 進入時 acquire，出來時 release 來控制總活動連線數</p>
-  </div></section>
-
-  <section id="multi-coro-lock-example-contd" class="slide"><div>
-      <pre class="language-python"><code>@asyncio.coroutine
-def quote_many(num_quotes=1, conn_limit=20):
-    <mark>semaphore = asyncio.Semaphore(conn_limit)</mark>
-    coroutines = [
-        quote_with_lock(semaphore)
-        for i in range(num_quotes)
-    ]
-    quotes = yield from asyncio.gather(*coroutines)
-    return quotes</code></pre>
-  </div></section>
-
-  <section id="multi-coro-lock-conclusion" class="slide"><div>
-      <pre class="language-python medium"><code>quotes = loop.run_until_complete(
-      quote_many(2000, conn_limit=100))</code></pre>
-      <h2>這樣就完成了</h2>
-      <ul>
-        <li>這樣需要 1.91 sec</li>
-        <li>感覺搞了很久，其實最後的 code 蠻簡單的</li>
-        <li>講到這邊差不多了</li>
-        <li>剩下的就只是爽度問題</li>
-      </ul>
-  </div></section>
-
-  <section id="asyncio-progressbar-cover" class="slide cover w subheader"><div>
-      <h2>所以我說那個進<br>度<br>條<br>呢</h2>
-      <img src="pics/mid.jpg" alt="">
-      <p class="subtitle">底下那根東西一直會動就是潮</p>
-    </div>
-    <style>
-      #asyncio-progressbar-cover h2 {
-        line-height: 1.2em;
-        text-shadow: 1px 1px 2px #fff;
-      }
-      #asyncio-progressbar-cover p {
-        font-size: 48px;
-        line-height: 1.2em;
-        position: absolute;
-        text-align: right;
-        color: #fff;
-        text-shadow: 1px 1px 2px #000;
-        bottom: -24px;
-        left: 170px;
-      }
-    </style>
   </section>
-
-  <section id="asyncio-progressbar" class="slide"><div>
-      <h2>進度條真的是好處多多</h2>
-      <ul>
-        <li>感覺很炫</li>
-        <li><del>方便知道自己還可以耍廢多久</del></li>
-        <li><strong>重點是讓自己覺得有進度啊</strong></li>
-        <li>這對士氣有絕對影響啊。誰想盯著一整天都沒有動靜的螢幕看，<br>而且一天快要結束的時候，發現自己在收數據的地方出了個 bug，超幹 </li>
-
-        <li>IPython Notebook 有 <code>IPython.html.widget.IntProgress</code>；<br>console 底下可以拿 pip (6.0+) 裡面的 progressbar 來用</li>
-      </ul>
-  </div></section>
-
-  <section id="progressbar-order-by-completeness" class="slide"><div>
-      <h2>不考慮原本執行順序的話</h2>
-      <p class="tighter">可以考慮用 <a class="pinkoi" href="https://docs.python.org/3.4/library/asyncio-task.html#asyncio.as_completed"><code>asyncio.as_completed(coroutines)</code></a>。<br>
-      它會把執行結束的 coroutine 依完成先後丟回對應的 Future</p>
-      <pre class="language-python"><code>quotes, step = [], 10
-for i, fut in enumerate(<mark>asyncio.as_completed(coros)</mark>, 1):
-    if i % step == 0:
-        progress.value += 1  # or progress.next()
-    q = yield from fut  # get the result of future
-    quotes.append(q)</code></pre>
-  </div></section>
-
-  <section id="progressbar-orig-order-way1" class="slide"><div>
-      <h2>考慮執行順序的話：方法一之<br>包成 Task 呼叫 .result()</h2>
-<pre class="language-python medium"><code>futures = [
-    asyncio.ensure_future(quote_with_lock(semaphore))
-    for i in range(num_quotes)
-]
-for i, fut in enumerate(asyncio.as_completed(futures), 1):
-    if i % step == 0:
-        progress.value += 1
-    yield from fut  # don't store
-<mark>quotes = [fut.result() for fut in futures]</mark></code></pre>
-  </div></section>
-
-  <section id="progressbar-orig-order-way2" class="slide"><div>
-      <h2>方法二之 callback</h2>
-      <pre class="language-python tighter"><code>done_tasks = 0
-def progress_adder(fut):
-    nonlocal done_tasks
-    done_tasks += 1
-    if done_tasks % step == 0:
-        progress.value += 1</code></pre>
-      <p>自己做一個 callback function <code>progress_adder</code> 負責增加 progress</p>
-  </div></section>
-
-  <section id="progressbar-orig-order-way2-contd" class="slide"><div>
-      <h2>（續）包成 Task 加上 callback</h2>
-<pre class="language-python"><code>futures = []  # wrap coroutines as Tasks
-for i in range(num_quotes):
-    task = asyncio.Task(quote_with_lock(semaphore))
-    <mark>task.add_done_callback(progress_adder)</mark>
-    futures.append(task)
-
-quotes = yield from (asyncio.gather(*futures))</code></pre>
-  </div></section>
-
-  <section id="progressbar-orig-order-way2-full" class="slide"><div>
-    <pre class="language-python small full-page"><code>@asyncio.coroutine
-def quote_many(num_quotes, conn_limit, progress, step):
-    semaphore = asyncio.Semaphore(conn_limit)
-    done_tasks = 0
-    def progress_adder(fut):
-        nonlocal done_tasks
-        done_tasks += 1
-        if done_tasks % step == 0:
-            progress.value += 1
-
-    futures = []
-    for i in range(num_quotes):
-        task = asyncio.Task(quote_with_lock(semaphore))
-        <mark>task.add_done_callback(progress_adder)</mark>
-        futures.append(task)
-
-    quotes = yield from (asyncio.gather(*futures))
-    return quotes</code></pre>
-  </div></section>
-
-  <section id="demo-console" class="slide"><div>
-      <h2>Demo: Console Progressbar</h2>
-      <div class="citation">
-        <img src="pics/console_out.gif" alt="Console Progressbar Demo" />
-        <p>Or view it on <a href="http://gfycat.com/OrnateTeemingBlackbear">gfycat</a></p>
-      </div>
-      <p>pip 6.0+ 裡面包了各種各樣的 progress bar (Ex. <a href="https://github.com/pypa/pip/blob/develop/pip/_vendor/progress/spinner.py">spinner</a>, <a href="https://github.com/pypa/pip/blob/develop/pip/_vendor/progress/counter.py">counter</a>, and <a href="https://github.com/pypa/pip/blob/develop/pip/_vendor/progress/bar.py">bar</a>)</p>
-  </div></section>
-
-  <section id="ipynb-demo" class="slide"><div>
-      <h2>Demo: IPython Notebook Progressbar</h2>
-      <div class="citation">
-        <img src="pics/ipynb_out.gif" alt="IPython Notebook Progressbar Demo" />
-        <p>Or view it on <a href="http://gfycat.com/HastySpryAmericanavocet">gfycat</a></p>
-      </div>
-      <p><code>step</code> 設太小，I/O 高且會拖慢速度（最快不超過 0.1s 更新一次）</p>
-  </div></section>
-
-  <section id="take-home-msg" class="slide"><div>
-      <h2>Take home message</h2>
-      <ul>
-        <li>Aysncio, event loop, and <strong>coroutine</strong> are not <em>that</em> unfriendly</li>
-        <li>ensure_future(coroutine) becomes <strong>Task</strong>, subclass of Future, which gets many goodies like add_done_callback and .result()</li>
-        <li>Multiple concurrent coroutines can be by <strong>gather(*coros)</strong> or <strong>as_completed(coros)</strong> to work simultaneously</li>
-        <li><strong>Semaphore</strong> controls the maximun of active concurrent coroutines</li>
-      </ul>
-  </div></section>
 
   <section id="pinkoi-hiring" class="slide cover"><div>
       <img src="pics/pinkoi_hiring.jpg" alt="" />
@@ -591,53 +170,6 @@ def quote_many(num_quotes, conn_limit, progress, step):
   </style>
   </section>
 
-  <section id="appendix-cover" class="slide cover w subheader"><div>
-      <h2>Appendix之<br>我很清楚這些東西沒時間講惹</h2>
-      <img src="pics/mid.jpg" alt="">
-    </div>
-    <style>
-    </style>
-  </section>
-
-  <section id="appendix-python3" class="slide"><div>
-      <h2>Who the X use Python 3?</h2>
-      <ul>
-        <li>Me. And <a href="http://www.i-programmer.info/news/216-python/7179-python-27-to-be-maintained-until-2020.html">everyone else 5 years later</a></li>
-        <li>Yes, all previous code requires Python 3.3+</li>
-        <li>You mentioned <strong>Python 3.5</strong>?<br>
-          <code>async</code> and <code>await</code> usage at <code>3_console_demo_py35.py</code></li>
-        <li>You mentioned <strong>Python 2.7</strong>?<br>
-          Tornado has its own event loop and can replace aiohttp.<br>
-          Alternatively, <a href="https://pypi.python.org/pypi/trollius">Trollius</a> is the asyncio on Python 2. Port is easy.
-        </li>
-      </ul>
-  </div></section>
-
-  <section id="appendix-tornado" class="slide"><div>
-      <h2>The REST server by Tornado</h2>
-      <pre class="language-python3 medium"><code>class RootHandler(tornado.web.RequestHandler):
-    def get(self):
-        response = {'message': 'Big Brother is watching you'}
-        self.write(response)
-        self.finish()
-
-if __name__ == '__main__':
-    app = tornado.web.Application([(r'^/$', RootHandler)])
-    app.listen(5566)  # try curl -s -XGET localhost:5566/
-      </code></pre>
-  </div></section>
-
-  <section id="appendix-tornado-async" class="slide"><div>
-      <h2>Add extra async operations</h2>
-      <p class="tighter">By default, Tornado app <em>already is</em> async.<br>To pause for an extra 0.5 sec before response,</p>
-      <pre class="language-python3 medium"><code>class SlowHandler(RootHandler):
-    @tornado.web.asynchronous
-    @gen.engine
-    def get(self):
-        yield gen.Task(IOLoop.current().add_timeout, time.time() + 0.5)
-        self.finish()  # close the connection</code></pre>
-  </div></section>
-
   <!-- End Slide -->
   <section id='end' class='slide cover shout w'><div>
       <h2>Questions?</h2>
@@ -646,19 +178,22 @@ if __name__ == '__main__':
     <style>
       #end h2 {
         position: absolute;
-        text-align: left;
-        top: 180px;
-        left: 130px;
-        color: #D91A3C;
-        text-shadow: 1px 2px 5px #E6F3FF;
-        font-size: 120px;
-        opacity: 0.9;
+        text-align: right;
+        top: auto;
+        left: auto;
+        bottom: -40px;
+        right:0px;
+        padding-right: 60px;
+        color: #ECCB15;
+        text-shadow: 1px 2px 5px #111;
+        font-size: 140px;
+        opacity: 0.95;
       }
     </style>
   </section>
 
   <!-- END OF SLIDE CONTENT -->
-  <p class="badge"><a href="https://github.com/ccwang002/play_aiohttp" target="_blank">Fork me on Github</a></p>
+  <p class="badge"><a href="https://github.com/ccwang002/2015Talk-Chinese-Search" target="_blank">Fork me on Github</a></p>
   <div class="progress"><div></div></div>
 
   <!-- Library -->
