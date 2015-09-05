@@ -7,7 +7,9 @@ Keyword: ElasticSearch, jieba, gensim, word2vec
     > On top of that part of the talk is about updates of Taiwan Python communities.
     > The shorten slides can be found at [TBD].
 
-- 2015.09.14 [MLDM Monday Meetup][mldm-monday]
+- 2015.09.14 MLDM Monday Meetup
+    - [Meetup link][mldm-monday]
+    - Youtube screencast (TBD)
 
 [mldm-monday]: http://www.meetup.com/Taiwan-R/events/224918468/
 
