@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Aiohttp</title>
+  <meta name="viewport" content="width=792, user-scalable=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <!-- Icon -->
+  <link href="pics/favicon.png" rel="icon" type="image/x-icon" />
+  <!-- MathJax -->
+  <!-- CSS Stle -->
+  <link rel="stylesheet" href="lib/shower/themes/ribbon/styles/screen.css">
+  <link rel="stylesheet" href="lib/highlight/styles/tomorrow.css" type="text/css"/>
+  <link rel="stylesheet" href="static/custom.css" type="text/css"/>
+</head>
+<body class="list">
+  <!-- Header in overview -->
+  <header class="caption">
+    <h1>Chinese Search Sharing</h1>
+    <p style="line-height: 32px; padding-top:15px;"><a href="http://liang2.tw">Liang Bo Wang (亮亮)</a>, 2015-07-14</p>
+  </header>
+  <!-- Cover slide -->
+  <section id="cover" class="slide cover w"><div>
+    <h3 id="talk-subheader">MLDM Monday, 2015-09-14</h3>
+    <h2 id="talk-header" class="place">中文搜尋經驗分享</h2>
+    <p id="talk-author">
+      By <a href="http://liang2.tw" target="_blank">Liang<sup>2</sup></a> under CC 4.0 BY license
+    </p>
+    <p id="usage-instr">
+      <kbd>Esc</kbd> to overview <br />
+      <kbd>←</kbd> <kbd>→</kbd> to navigate
+    </p>
+    <img src="pics/cover.jpg" alt="">
+  </div>
+  <style>
+    #talk-header {
+      color: #EEE;
+      text-shadow: 0px 0px 5px black;
+      text-align: center;
+      font-size: 110px;
+      line-height: 1.2em;
+      opacity: 1;
+      position: relative;
+      top: 60px;
+      width: 120%;
+    }
+    #talk-subheader {
+      color: #E9FFDA;
+      text-shadow: 0px 0px 2px black;
+      text-align: center;
+      font-size: 36px;
+      opacity: 1;
+      position: relative;
+      top: -20px;
+    }
+    #talk-author {
+      position: relative;
+      line-height: 1.2em;
+      text-shadow: 1px 1px 3px #000;
+    }
+    #talk-author {
+      top: 0px;
+    }
+    #talk-author a {
+      color: #FFFA20;
+    }
+    #cover p {
+      margin: 10px 0 0;
+      text-align: center;
+      color: #FFF;
+      font-size: 32px;
+      opacity: 1;
+    }
+    #usage-instr {
+      position: absolute;
+      text-align: right;
+      right: 30px;
+      bottom: 20px;
+    }
+    #usage-instr kbd {
+      opacity: 0.8;
+      color: #784639;
+      background-color: white;
+    }
+    #cover .src-link {
+      position: absolute;
+      font-size: 14px;
+      text-align: right;
+      bottom: 10px;
+      right: 10px;
+    }
+    #cover img {
+      opacity: 0.85;
+    }
+  </style>
+  </section>
+
+  <section id="about-me" class="slide"><div>
+      <h2>關於我</h2>
+      <ul>
+        <li>會說一些 R 和 Python</li>
+        <li>PyCon TW 2016 議程組：誠徵<strong class="pinkoi">志工</strong>！！</li>
+        <li>NTU Bioinfo master student<br>歡迎找我聊我的研究題目</li>
+        <li>Former intern at Microsoft Research Asia</li>
+        <li>Intern at <strong><a href="http://www.pinkoi.com/about" class="pinkoi">Pinkoi</a></strong></li>
+        <li>此人偏宅，但今天不一定有宅梗</li>
+      </ul>
+      <img id="protrait" src="pics/me.jpg" class="place r"alt="">
+    </div>
+    <style>
+      #protrait {
+        margin-right: 120px;
+        width: 300px;
+      }
+      #about-me ul {
+        width: 60%;
+      }
+    </style>
+  </section>
+
+  <section id="mid-cover" class="slide cover w subheader mid"><div>
+      <h2>Test Cover</h2>
+      <img src="pics/mid.jpg" alt="">
+    </div>
+  </section>
+
+  <section id="mid2-cover" class="slide cover w subheader mid2"><div>
+      <h2>中間標題測試</h2>
+      <img src="pics/mid2.jpg" alt="">
+    </div>
+  </section>
+
+  <section id="pinkoi-hiring" class="slide cover"><div>
+      <img src="pics/pinkoi_hiring.jpg" alt="" />
+      <h2><a href="http://www.pinkoi.com/about/pinkoist"><img src="pics/pinkoi.png" alt="Pinkoi"></a>is hiring</h2>
+      <p class="job">Back-End | QA | Data | Search<br>Front-End | iOS | Android</p>
+  </div>
+  <style>
+    #pinkoi-hiring div > img {
+      opacity: 0.9;
+      width: 100%;
+    }
+    #pinkoi-hiring h2 img {
+      vertical-align: middle;
+      position: relative;
+      height: 1.8em;
+      margin-right: 0.1em;
+    }
+    #pinkoi-hiring h2 a {
+      background: none;
+    }
+    #pinkoi-hiring h2 {
+      color: #eee;
+      position: absolute;
+      font-size: 130px;
+      bottom: 80px;
+      right: 30px;
+    }
+    #pinkoi-hiring p {
+      position: absolute;
+      text-align: right;
+      color: #eee;
+    }
+    #pinkoi-hiring .job {
+      font-size: 24px;
+      line-height: 1.5em;
+      bottom: 50px;
+      right: 35px;
+    }
+  </style>
+  </section>
+
+  <!-- End Slide -->
+  <section id='end' class='slide cover shout w'><div>
+      <h2>Questions?</h2>
+      <img src="pics/end.jpg" alt="">
+    </div>
+    <style>
+      #end h2 {
+        position: absolute;
+        text-align: right;
+        top: auto;
+        left: auto;
+        bottom: -40px;
+        right:0px;
+        padding-right: 60px;
+        color: #ECCB15;
+        text-shadow: 1px 2px 5px #111;
+        font-size: 140px;
+        opacity: 0.95;
+      }
+    </style>
+  </section>
+
+  <!-- END OF SLIDE CONTENT -->
+  <p class="badge"><a href="https://github.com/ccwang002/2015Talk-Chinese-Search" target="_blank">Fork me on Github</a></p>
+  <div class="progress"><div></div></div>
+
+  <!-- Library -->
+  <script src="lib/highlight/highlight.pack.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  <script src="lib/shower/shower.min.js"></script>
+  <!-- Mathjax -->
+  <!-- During local development, use localhost mathjax for speed-->
+  <!--<script src="file:///Users/liang/.ipython/profile_default/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>-->
+  <!-- online Mathjax CDN -->
+  <!--<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>-->
+</body>
+</html>
