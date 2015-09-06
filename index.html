@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Aiohttp</title>
+  <title>Chinese Search</title>
   <meta name="viewport" content="width=792, user-scalable=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <!-- Icon -->
@@ -118,6 +118,123 @@
     </style>
   </section>
 
+  <section id="background" class="slide"><div>
+      <h2>背景介紹</h2>
+      <ul>
+        <li>敝公司用 ElasticSearch (ES) 做站上商品的搜尋</li>
+        <li>多數亞洲文字（中、日、泰）都需要額外斷詞處理</li>
+        <li>內建有一個 ICU（International Components for Unicode）Analyzer，<br>基本能動但效果有限（參考 <a href="http://userguide.icu-project.org/boundaryanalysis">ICU - Text Boundary Analysis</a>）</li>
+        <li>ES 改版之快，估計會被海放到 2.0……反正它海放了一堆第三方套件，所以想升也沒辦法</li>
+        <li>關於 ES Analyzer 的使用可以參考<a href="https://www.elastic.co/blog/found-text-analysis-part-1">官網教學</a></li>
+      </ul>
+  </div></section>
+
+  <section id="es-basics-cover" class="slide cover w subheader mid"><div>
+      <h2>ES Search Basics</h2>
+      <img src="pics/mid.jpg" alt="">
+    </div>
+  </section>
+
+  <section id="term-definition" class="slide"><div>
+      <h2>ES 搜尋的最小單位是 Term (Token)</h2>
+      <figure>
+        <blockquote>
+          <p>Who controls the past controls the future. Who controls the present controls the past. <span class="author">- 1984, George Orwell</span></p>
+        </blockquote>
+      </figure>
+      <p class="tighter">會被 ES Tokenizer 轉換成 Who / controls / the / past / controls / the / future / Who / controls / the / present / controls / the / past。<br>
+        實務上會在 tokenizer 前後加上 filter 小寫轉換、去除無意義的 a、the。</p>
+      <p class="tighter">這裡 term 有：controls(4), the(4), Who(2), past(2), future(1), present(1)</p>
+    </div>
+  </section>
+
+  <section id="how-es-search" class="slide"><div>
+      <h2>所以 ES (Lucene) 是怎麼搜尋的？</h2>
+      <p>零魔法，最核心的概念是 <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a>。可以自己做一個。細節見附錄。</p>
+      <ul>
+        <li><strong>Term Frequency (TF)</strong>：在 document 中出現的次數多寡</li>
+        <li><strong>Inverse Document Frequency (IDF)</strong>：這 term 總共在多少 document 中出現，出現太頻繁的（we, you）的權重較低</li>
+        <li><strong>Field length</strong>：document 越短，有找到表示越相關</li>
+      </ul>
+      <p>上三個會生成相似度 similarity，最後結合其他自定的指標變成 score</p>
+  </div></section>
+
+  <section id="tf-idf-in-action" class="slide"><div>
+      <pre class="language-python"><code># python3 tf_idf.py 後背包
+Searching 後背包 in 7 documents ...
+['復古單寧帆布後雙背包',  '米色帆布橫式側背包',
+ '藍色石紋斜背包',       '帆布眼鏡盒',
+ '鱷魚來了帆布筆袋',     '拼木紋布質文庫書衣',
+ '單眼相機用亮彩防水包布']
+Top 3 similar documents are:
+d1: 復古單寧帆布後雙背包 [sim=0.4969]
+d3: 藍色石紋斜背包 [sim=0.3262]
+d2: 米色帆布橫式側背包 [sim=0.3017]</code></pre>
+  </div></section>
+
+
+  <section id="tf-idf-inner" class="slide"><div>
+      <h2>Under the hood - cos similarity</h2>
+      <pre class="language-python small"><code>q  = {後: 1.00, 背: 1.00, 包: 1.00}
+
+d1 = {復: 2.25, 古: 2.25, 單: 1.85, <mark>寧: 2.25</mark>, 帆: 1.34, <mark>布: 1.00</mark>,
+      後: 2.25, 雙: 2.25, 背: 1.56, 包: 1.34}
+d2 = {米: 2.25, 色: 1.85, 帆: 1.34, 布: 1.00, 橫: 2.25, 式: 2.25,
+      側: 2.25, 背: 1.56, 包: 1.34}
+d3 = {藍: 2.25, 色: 1.85, 石: 2.25, 紋: 1.85, 斜: 2.25, 背: 1.56, 包: 1.34}
+d4 = {帆: 1.34, 布: 1.00, 眼: 1.85, 鏡: 2.25, 盒: 2.25}
+d5 = {鱷: 2.25, 魚: 2.25, 帆: 1.34, 布: 1.00, 筆: 2.25, 袋: 2.25}
+d6 = {拼: 2.25, 木: 2.25, 紋: 1.85, 布: 1.00, 質: 2.25, 文: 2.25, 庫: 2.25,
+      書: 2.25, 衣: 2.25}
+d7 = {單: 1.85, 眼: 1.85, 相: 2.25, 機: 2.25, 用: 2.25, 亮: 2.25, 彩: 2.25,
+      防: 2.25, 水: 2.25, 包: 1.34, 布: 1.00}</code></pre>
+  </div></section>
+
+
+  <section id="char-based-problem" class="slide"><div>
+      <h2>問題是一字字斷詞破壞中文詞意</h2>
+      <pre class="language-python tighter"><code>Searching 包布 in 7 documents ...
+Top 3 similar documents are:
+d2: 米色帆<mark>布</mark>橫式側背<mark>包</mark> [sim=0.2981]
+d1: 復古單寧帆<mark>布</mark>後雙背<mark>包</mark> [sim=0.2762]
+d7: 單眼相機用亮彩防水<mark>包布</mark> [sim=0.2459]</code></pre>
+      <p>包布 ≠ 布包 ≠ 布○○包。我們需要更好的分詞模式。</p>
+  </div></section>
+
+
+<!--
+過去很近，近的就在眼前，以致於你一集中焦距就看出了它的遠。
+師傅，我已經變成瞎眼了。從今以後一輩子都看不見您的臉了，在她面前叩頭說道。
+穿過縣界長長的隧道，便是雪國。夜空下一片白茫茫。火車在信號所前停了下來。
+原來明治時代的木頭裡根本就沒有埋藏仁王。同時，也明白了為何運慶至今仍健在的理由。
+Java is a serious language for serious business used by serious grown-ups
+-->
+
+  <section id="cht-term-redefine" class="slide"><div>
+      <h2>中文的斷詞應該像這樣</h2>
+      <figure>
+        <blockquote class="cjk">
+          <p>過去很近，近的就在眼前，以致於你一集中焦距就看出了它的遠。<br><span class="author">張惠菁。《你不相信的事》</span></p>
+        </blockquote>
+      </figure>
+      <ul>
+        <li>過去 / 很 / 近 / 近 / 的 / 就 / 在 / 眼前 / 以致於 / 你 / 一 / 集中 / 焦距 / 就 / 看出 / 了 / 它 / 的 / 遠</li>
+        <li>很顯然地這不是簡單的切割</li>
+        <li>在 ES 就可以靠設計 Tokenizer(Analyzer) 來完成複雜的斷詞</li>
+      </ul>
+  </div></section>
+
+  <section id="jieba" class="slide"><div>
+      <h2>中文斷詞我們選擇 jieba</h2>
+      <ul>
+        <li>Jieba 是從 Python 移植過來的。有人寫好 ES Analyzer</li>
+        <li>架構簡單，安裝完就有不錯的效果</li>
+        <li>完整的教學可以參考 <a href="https://speakerdeck.com/fukuball/jieba-jie-ba-zhong-wen-duan-ci">fukuball 的 jieba 介紹</a></li>
+        <li>真的，我學的時候也是看 fukuball 網誌</li>
+        <li>詞典、詞頻、Trie 樹 DAG 比對</li>
+      </ul>
+  </div></section>
+
   <section id="mid-cover" class="slide cover w subheader mid"><div>
       <h2>Test Cover</h2>
       <img src="pics/mid.jpg" alt="">
@@ -129,6 +246,19 @@
       <img src="pics/mid2.jpg" alt="">
     </div>
   </section>
+
+  <section id="not-the-best-way" class="slide"><div>
+      <h2>今天提的未必是最好的方法</h2>
+      <ul>
+        <li>不要一開始就「砍掉重練」</li>
+        <li>簡單的方法能動就用簡單的</li>
+        <li>20% 的工完成 80% 的效果</li>
+      </ul>
+      <ul>
+        <li>「咦你剛剛說用 KNN，但那不是………為什麼不用……」</li>
+        <li>「因為它能動，而且效果能接受」</li>
+      </ul>
+  </div></section>
 
   <section id="pinkoi-hiring" class="slide cover"><div>
       <img src="pics/pinkoi_hiring.jpg" alt="" />
