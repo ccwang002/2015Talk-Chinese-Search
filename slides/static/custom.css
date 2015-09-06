@@ -19,6 +19,16 @@
     margin-left: 120px;
 }
 
+.slide blockquote p > span.author {
+    float: right;
+    margin-right: 1rem;
+    font-weight: 700;
+}
+.slide blockquote.cjk p {
+    font-style: normal;
+    font-family: "標楷體", "BiauKai", "Kaiti TC", "Kaiti", "DFLiKaiShu", "DFKai-sb", serif;
+}
+
 /* sub header */
 .slide.subheader.mid h2 {
     margin: 0px 0 0px;
