@@ -194,11 +194,12 @@ d7 = {單: 1.85, 眼: 1.85, 相: 2.25, 機: 2.25, 用: 2.25, 亮: 2.25, 彩: 2.2
   <section id="char-based-problem" class="slide"><div>
       <h2>問題是一字字斷詞破壞中文詞意</h2>
       <pre class="language-python tighter"><code>Searching 包布 in 7 documents ...
+
 Top 3 similar documents are:
 d2: 米色帆<mark>布</mark>橫式側背<mark>包</mark> [sim=0.2981]
 d1: 復古單寧帆<mark>布</mark>後雙背<mark>包</mark> [sim=0.2762]
 d7: 單眼相機用亮彩防水<mark>包布</mark> [sim=0.2459]</code></pre>
-      <p>包布 ≠ 布包 ≠ 布○○包。我們需要更好的分詞模式。</p>
+      <p><span class="pinkoi">包布 ≠ 布包 ≠ 布○○包。</span>我們需要更好的分詞模式。</p>
   </div></section>
 
 
@@ -219,21 +220,163 @@ Java is a serious language for serious business used by serious grown-ups
       </figure>
       <ul>
         <li>過去 / 很 / 近 / 近 / 的 / 就 / 在 / 眼前 / 以致於 / 你 / 一 / 集中 / 焦距 / 就 / 看出 / 了 / 它 / 的 / 遠</li>
+        <li>米色 / 帆布 / 橫式 / 側背包</li>
         <li>很顯然地這不是簡單的切割</li>
         <li>在 ES 就可以靠設計 Tokenizer(Analyzer) 來完成複雜的斷詞</li>
       </ul>
   </div></section>
 
-  <section id="jieba" class="slide"><div>
+  <section id="jieba-intro" class="slide"><div>
       <h2>中文斷詞我們選擇 jieba</h2>
       <ul>
         <li>Jieba 是從 Python 移植過來的。有人寫好 ES Analyzer</li>
         <li>架構簡單，安裝完就有不錯的效果</li>
-        <li>完整的教學可以參考 <a href="https://speakerdeck.com/fukuball/jieba-jie-ba-zhong-wen-duan-ci">fukuball 的 jieba 介紹</a></li>
-        <li>真的，我學的時候也是看 fukuball 網誌</li>
-        <li>詞典、詞頻、Trie 樹 DAG 比對</li>
+        <li>完整教學可參考 <a href="https://speakerdeck.com/fukuball/jieba-jie-ba-zhong-wen-duan-ci">fukuball 的介紹</a>（我學的時候也是看他網誌）</li>
+        <li>幾個技術關鍵字：詞典、詞頻、Trie 樹、DAG、HMM</li>
+        <li>概念很簡單：看看這個詞有沒有在詞典裡，有的話就照著斷；沒有的話就用中文常見的拆詞規律猜（跑出新的詞）</li>
+        <li>詞典內建就有一個，效果也很好</li>
       </ul>
   </div></section>
+
+  <section id="jieba-example" class="slide"><div>
+      <h2 class="tighter">Jieba in action</h2>
+      <pre class="language-python"><code>'/'.join(jieba.cut(
+      '過去很近，近的就在眼前，'
+      '以致於你一集中焦距就看出了它的遠。'))
+# 過去/很近/，/近/的/就/在/眼前/，/
+# 以致於/你/一/集中/焦距/就/看出/了/它/的/遠/。
+
+'/'.join(jieba.cut('穿過縣界長長的隧道，便是雪國。'))
+# 穿過/縣界/長長的/隧道/，/便是/雪國/。
+</code></pre>
+  </div></section>
+
+  <section id="jieba-example-hmm" class="slide"><div>
+      <h2>Jieba HMM in action</h2>
+      <pre class="language-python"><code>'/'.join(jieba.cut('便是雪國', HMM=True))
+# 便是/<mark>雪國</mark>
+'/'.join(jieba.cut('便是雪國', HMM=False))
+# 便是/<mark>雪/國</mark></code></pre>
+  <p>在中文，二字二字成詞比後者的組合機會高得多<br>（極端的例子：「科科科科科」也會被拆成「科科/科科科」</p>
+  </div></section>
+
+  <section id="jieba-pitfall" class="slide"><div>
+       <figure>
+        <blockquote>
+          <p>Some people, when confronted with a Chinese segmentation porblem, think "I know, I'll use a dictionary look-up." Now they have two problems.<span class="author">(An super old <a href="http://regex.info/blog/2006-09-15/247">meme</a>)</span></p>
+        </blockquote>
+      </figure>
+      <pre class="language-python tighter"><code>cut('相機包布')           # 相機包 / 布
+cut('台中太陽餅')         # 台 / 中 / 太陽 / 餅
+cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
+      <ul>
+        <li>詞除了要夠齊全（台中、太陽餅）</li>
+        <li>詞頻也要符合文本的分佈（相機、包布）</li>
+        <li class="next pinkoi">啊第三個是錯在哪裡啦（翻桌！）</li>
+      </ul>
+      <div class="sidenote grey">
+        <p>實際上 jieba 內建的字典並沒有這個問題，但我覺得這個例子比較簡單</p>
+      </div>
+    </div>
+    <style>
+      #jieba-pitfall .sidenote p {
+        margin-bottom: 5px;
+        line-height: 1.5em;
+      }
+      #jieba-pitfall .sidenote {
+        position: absolute;
+        width: 320px;
+        right: 80px;
+        bottom: 75px;
+        line-height: 1.5em;
+        font-size: 20px;
+        padding: 0 10px;
+        border: dotted 1px grey;
+      }
+    </style>
+  </section>
+
+  <section id="cht-seg-pitfall" class="slide twocol"><div>
+      <h2>側背包≠ 側肩 + 背包？！</h2>
+      <div class="left">
+        <ul class="tighter">
+          <li>使用者查<span class="pinkoi">「側背包」</span></li>
+          <li>產品裡有個「側肩 / 背包」</li>
+          <li>ES 的行為：</li>
+          <ol>
+            <li>側背包 in 側肩？否</li>
+            <li>側背包 in 背包？否</li>
+            <li>回傳找不到相關商品</li>
+          </ol>
+        </ul>
+      </div>
+      <div class="right">
+        <ul class="tighter">
+          <li>使用者查<span class="pinkoi">「側 / 背包」</span></li>
+          <li>產品裡有個「側肩 / 背包」</li>
+          <li>ES 的行為：</li>
+          <ol>
+            <li>側 in 側肩？是</li>
+            <li>背包 in 背包？是</li>
+            <li>回傳找到相關商品</li>
+          </ol>
+        </ul>
+      </div>
+      <p>斷詞不是切越長越好！查不到比查不準還慘……有沒有改進方法？</p>
+  </div></section>
+
+  <section id="jieba-index-mode" class="slide"><div>
+      <h2>Jieba search(index) mode</h2>
+      <p>解決上述複合詞斷詞問題，能要求 jieba 把可能的斷詞組合都列出，但並不能完全解決問題。</p>
+      <pre class="language-python tighter"><code>cut_for_search('側背包')
+# 背包 / 側背包</code></pre>
+      <p>在這裡就少了個「側」詞。使用者能查到背包但缺乏「側」的訊息。</p>
+  </div></section>
+
+  <section id="seg-dict-importance" class="slide"><div>
+      <h2>斷詞詞典與詞頻要小心</h2>
+      <ul>
+        <li>仔細看 jieba 文件的話，它的詞典是透過<a href="https://github.com/fxsjy/jieba/issues/7">幾個簡體語料庫</a>結合新詞探勘所做成，再使用簡繁轉換</li>
+        <li>裡面有一些「一万一千五百二十颗」、「一九九九年」、「黄蓉拾」、「黄蓉之」等無義詞，增加計算負擔</li>
+        <li>其中「帆布背包」、「水晶項鍊」這種就要小心會讓搜尋鬼打牆</li>
+        <li>砍掉重練？等等，能重練的話那當初……（無限雞生蛋 loop）</li>
+      </ul>
+  </div></section>
+
+  <section id="coscup2013-moedict" class="slide cover h"><div>
+      <img src="pics/external/coscup2013_moedict.png" alt="">
+  </div></section>
+
+  <section id="coscup2013-moedict-quote" class="slide"><div>
+      <h2>萌典、g0v 中文斷詞</h2>
+      <figure>
+        <blockquote class="cjk">
+          <p>中文斷詞有很多經驗算法……最直覺的做法，就是拿一個字典，比對最長相同的部份斷詞……我們手邊剛好有一個很大的詞典<span class="author">唐鳳，<a href="https://speakerdeck.com/audreyt/meng-dian-at-coscup-2013-chai-zheng-fu-yuan-di-zhong-jian">COSCUP 2013</a></span></p>
+        </blockquote>
+      </figure>
+      <p>2013 年，我坐在台下聽</p>
+      <p>2015 年，我用到它了</p>
+  </div></section>
+
+<!--
+Lowest term freq = -28.68
+           ['西連寺春菜'] =>                            西連寺春菜[-28.68], log(p) = -28.68
+       ['西', '連寺春菜'] =>                    西[-7.51] 連寺春菜[-28.68], log(p) = -36.19
+       ['西連寺春', '菜'] =>                    西連寺春[-28.68] 菜[-9.28], log(p) = -37.96
+['西', '連', '寺', '春', '菜'] => 西[-7.51] 連[-8.66] 寺[-9.30] 春[-9.09] 菜[-9.28], log(p) = -43.84
+   ['西', '連', '寺春菜'] =>            西[-7.51] 連[-8.66] 寺春菜[-28.68], log(p) = -44.85
+   ['西', '連寺春', '菜'] =>            西[-7.51] 連寺春[-28.68] 菜[-9.28], log(p) = -45.47
+   ['西連寺', '春', '菜'] =>            西連寺[-28.68] 春[-9.09] 菜[-9.28], log(p) = -47.05
+['西', '連', '寺春', '菜'] =>    西[-7.51] 連[-8.66] 寺春[-28.68] 菜[-9.28], log(p) = -54.13
+['西', '連', '寺', '春菜'] =>    西[-7.51] 連[-8.66] 寺[-9.30] 春菜[-28.68], log(p) = -54.15
+['西', '連寺', '春', '菜'] =>    西[-7.51] 連寺[-28.68] 春[-9.09] 菜[-9.28], log(p) = -54.56
+['西連', '寺', '春', '菜'] =>    西連[-28.68] 寺[-9.30] 春[-9.09] 菜[-9.28], log(p) = -56.35
+       ['西連寺', '春菜'] =>                   西連寺[-28.68] 春菜[-28.68], log(p) = -57.36
+       ['西連', '寺春菜'] =>                   西連[-28.68] 寺春菜[-28.68], log(p) = -57.36
+   ['西', '連寺', '春菜'] =>           西[-7.51] 連寺[-28.68] 春菜[-28.68], log(p) = -64.87
+   ['西連', '寺春', '菜'] =>           西連[-28.68] 寺春[-28.68] 菜[-9.28], log(p) = -66.64
+   ['西連', '寺', '春菜'] =>           西連[-28.68] 寺[-9.30] 春菜[-28.68], log(p) = -66.66
+-->
 
   <section id="mid-cover" class="slide cover w subheader mid"><div>
       <h2>Test Cover</h2>
@@ -339,3 +482,4 @@ Java is a serious language for serious business used by serious grown-ups
   <!--<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>-->
 </body>
 </html>
+        </blockquote>
