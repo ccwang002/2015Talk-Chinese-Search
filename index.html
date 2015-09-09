@@ -172,7 +172,6 @@ d3: 藍色石紋斜背包 [sim=0.3262]
 d2: 米色帆布橫式側背包 [sim=0.3017]</code></pre>
   </div></section>
 
-
   <section id="tf-idf-inner" class="slide"><div>
       <h2>Under the hood - cos similarity</h2>
       <pre class="language-python small"><code>q  = {後: 1.00, 背: 1.00, 包: 1.00}
@@ -190,7 +189,6 @@ d7 = {單: 1.85, 眼: 1.85, 相: 2.25, 機: 2.25, 用: 2.25, 亮: 2.25, 彩: 2.2
       防: 2.25, 水: 2.25, 包: 1.34, 布: 1.00}</code></pre>
   </div></section>
 
-
   <section id="char-based-problem" class="slide"><div>
       <h2>問題是一字字斷詞破壞中文詞意</h2>
       <pre class="language-python tighter"><code>Searching 包布 in 7 documents ...
@@ -201,7 +199,6 @@ d1: 復古單寧帆<mark>布</mark>後雙背<mark>包</mark> [sim=0.2762]
 d7: 單眼相機用亮彩防水<mark>包布</mark> [sim=0.2459]</code></pre>
       <p><span class="pinkoi">包布 ≠ 布包 ≠ 布○○包。</span>我們需要更好的分詞模式。</p>
   </div></section>
-
 
 <!--
 過去很近，近的就在眼前，以致於你一集中焦距就看出了它的遠。
@@ -327,11 +324,33 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
 
   <section id="jieba-index-mode" class="slide"><div>
       <h2>Jieba search(index) mode</h2>
-      <p>解決上述複合詞斷詞問題，能要求 jieba 把可能的斷詞組合都列出，但並不能完全解決問題。</p>
-      <pre class="language-python tighter"><code>cut_for_search('側背包')
-# 背包 / 側背包</code></pre>
-      <p>在這裡就少了個「側」詞。使用者能查到背包但缺乏「側」的訊息。</p>
-  </div></section>
+      <p class="tighter">解決上述複合詞斷詞問題，能要求 jieba 把可能的斷詞組合都列出。</p>
+      <pre class="language-python tighter"><code>cut_for_search('側背包')     cut_for_search('帆布鞋')
+# 背包 / 側背包              # 帆布 / 布鞋 / 帆布鞋</code></pre>
+      <p>但並不能完全解決問題，有時候會缺字<sup>註</sup>，在這裡就少了個「側」詞。使用者能查到背包但缺乏「側」的訊息。<br>
+      另外詞變多了，會增加搜尋的負擔。</p>
+      <div class="sidenote grey">
+        <p>註：推估原因是 jieba 內建的 HMM 沒有繁體字 ，所以 \(P(\text{側}|B) = 0\) 新詞</p>
+      </div>
+    </div>
+    </div>
+    <style>
+      #jieba-index-mode .sidenote p {
+        margin-bottom: 5px;
+        line-height: 1.5em;
+      }
+      #jieba-index-mode .sidenote {
+        position: absolute;
+        width: 230px;
+        right: 130px;
+        bottom: 65px;
+        line-height: 1.5em;
+        font-size: 20px;
+        padding: 0 10px;
+        border: dotted 1px grey;
+      }
+    </style>
+  </section>
 
   <section id="seg-dict-importance" class="slide"><div>
       <h2>斷詞詞典與詞頻要小心</h2>
@@ -339,7 +358,7 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
         <li>仔細看 jieba 文件的話，它的詞典是透過<a href="https://github.com/fxsjy/jieba/issues/7">幾個簡體語料庫</a>結合新詞探勘所做成，再使用簡繁轉換</li>
         <li>裡面有一些「一万一千五百二十颗」、「一九九九年」、「黄蓉拾」、「黄蓉之」等無義詞，增加計算負擔</li>
         <li>其中「帆布背包」、「水晶項鍊」這種就要小心會讓搜尋鬼打牆</li>
-        <li>砍掉重練？等等，能重練的話那當初……（無限雞生蛋 loop）</li>
+        <li class="next">砍掉重練？等等，能重練的話那當初……（無限雞生蛋 loop）</li>
       </ul>
   </div></section>
 
@@ -351,12 +370,87 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
       <h2>萌典、g0v 中文斷詞</h2>
       <figure>
         <blockquote class="cjk">
-          <p>中文斷詞有很多經驗算法……最直覺的做法，就是拿一個字典，比對最長相同的部份斷詞……我們手邊剛好有一個很大的詞典<span class="author">唐鳳，<a href="https://speakerdeck.com/audreyt/meng-dian-at-coscup-2013-chai-zheng-fu-yuan-di-zhong-jian">COSCUP 2013</a></span></p>
+          <p>中文斷詞有很多經驗算法……最直覺的做法，就是拿一個字典，比對最長相同的部份斷詞……我們手邊剛好有一個很大的詞典，萌典。<span class="author">唐鳳，<a href="https://speakerdeck.com/audreyt/meng-dian-at-coscup-2013-chai-zheng-fu-yuan-di-zhong-jian">COSCUP 2013</a></span></p>
         </blockquote>
       </figure>
       <p>2013 年，我坐在台下聽</p>
       <p>2015 年，我用到它了</p>
   </div></section>
+
+  <section id="moedict-intro" class="slide"><div>
+      <h2>萌典</h2>
+      <ul>
+        <li><span class="pinkoi">國語辭典</span>，來源為教育部《<a href="http://dict.revised.moe.edu.tw/">重編國語辭典修訂本</a>》</li>
+        <ul>
+          <li>16 萬筆條目</li>
+          <li>CC BY-ND 3.0 臺灣授權</li>
+          <li>不過辭典編輯完成於 1998 年，裡面沒有「手機」這種詞條</li>
+        </ul>
+        <li><span class="pinkoi">兩岸詞典</span>，來源為<a href="http://www.gacc.org.tw/art_base/">中華文化總會</a></li>
+        <ul>
+          <li>8 萬多筆條目，收錄了「手機」、「宅男」等詞條</li>
+          <li>不過是採用 CC BY-NC-ND 3.0 臺灣授權</li>
+          <li>適合研究使用（商業能使用嗎？）</li>
+        </ul>
+      </ul>
+      <div id="moedict-logo" class="citation">
+        <img src="pics/external/moedict_logo.png" alt="">
+        <p>Ref: <a href="https://twitter.com/moedict">moedict</a></p>
+      </div>
+  </div>
+  <style>
+    #moedict-logo {
+      position: absolute;
+      top: 110px;
+      right: 110px;
+      width: 230px;
+      height: auto;
+    }
+  </style>
+  </section>
+
+  <section id="moedict-example" class="slide cover w"><div>
+    <img src="pics/external/moedict_example.png" alt="">
+  </div></section>
+
+  <section id="moedict-example-json" class="slide"><div>
+    <pre class="language-json"><code># /a/狂狷.json
+{"h": [
+  {"d": [
+    {"q": ["`論語~．`子路~：「`子~`曰~：『`不得~`中行~`而~`與~`之~，`必~`也~`狂狷~`乎~？`狂~`者~`進取~，`狷~`者~`有~`所~`不為~`也~。』」",
+           "`抱朴子~．`外篇~．`逸民~：「`昔~`狂狷~`華~`士~，`義~`不事~`上~，`隱~`於~`海隅~，`而~`太公~`誅~`之~。`吾子~`沉~`遁~，`不亦~`危~`乎~？」"],
+     "f":"`過於~`激進~`與~`過於~`保守~`的~`人~。"}],
+   "p": "kuáng juàn",
+   "b": "ㄎㄨㄤˊ ㄐㄩㄢˋ",
+   "=": "2654000071"}],
+ "t": "`狂~`狷~"}</code></pre>
+  </div></section>
+
+  <section id="jieba-moedict" class="slide"><div>
+      <h2>讓 jieba 使用萌典</h2>
+      <ul>
+        <li>jieba 詞典引入萌典的詞條，用說明、例句建立詞頻</li>
+        <li>OpenCC 做繁簡轉換</li>
+        <li>缺詞？「手機」、「潮t」、「手作」、「客製」</li>
+        <ul>
+          <li>其他資料來源，例：搜尋記錄</li>
+          <li>最後仍然可以 fallback 回手動加詞</li>
+          <li>不夠技術？之後再回來談缺詞</li>
+        </ul>
+        <li>其實光用這些，效果就很好了</li>
+      </ul>
+  </div></section>
+
+  <section id="handcraft-counter-tf" class="slide"><div>
+      <h2>單用詞頻斷詞就有不錯的效果</h2>
+      <img src="pics/results/handcraft_counter_tf.png" alt="">
+    </div>
+    <style>
+      #handcraft-counter-tf img {
+        width: 100%;
+      }
+    </style>
+  </section>
 
 <!--
 Lowest term freq = -28.68
@@ -479,7 +573,6 @@ Lowest term freq = -28.68
   <!-- During local development, use localhost mathjax for speed-->
   <!--<script src="file:///Users/liang/.ipython/profile_default/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>-->
   <!-- online Mathjax CDN -->
-  <!--<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>-->
+  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 </body>
 </html>
-        </blockquote>
