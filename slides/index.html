@@ -429,13 +429,28 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
   <section id="jieba-moedict" class="slide"><div>
       <h2>讓 jieba 使用萌典</h2>
       <ul>
-        <li>詞典從萌典的詞條開始建</li>
-        <li>用例句</li>
-        <li></li>
-        <li></li>
+        <li>jieba 詞典引入萌典的詞條，用說明、例句建立詞頻</li>
+        <li>OpenCC 做繁簡轉換</li>
+        <li>缺詞？「手機」、「潮t」、「手作」、「客製」</li>
+        <ul>
+          <li>其他資料來源，例：搜尋記錄</li>
+          <li>最後仍然可以 fallback 回手動加詞</li>
+          <li>不夠技術？之後再回來談缺詞</li>
+        </ul>
+        <li>其實光用這些，效果就很好了</li>
       </ul>
   </div></section>
 
+  <section id="handcraft-counter-tf" class="slide"><div>
+      <h2>單用詞頻斷詞就有不錯的效果</h2>
+      <img src="pics/results/handcraft_counter_tf.png" alt="">
+    </div>
+    <style>
+      #handcraft-counter-tf img {
+        width: 100%;
+      }
+    </style>
+  </section>
 
 <!--
 Lowest term freq = -28.68
