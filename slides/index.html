@@ -135,6 +135,15 @@
     </div>
   </section>
 
+  <section id="ideal-search" class="slide"><div>
+    <h2>搜尋的基本要求</h2>
+    <ul>
+      <li>搜尋「○○」，則所有跟○○有關的東西都要找到</li>
+      <li>在「○○」的結果中，不要出現不相關的ｘｘ</li>
+      <li>寧可有些ｘｘ也不要○○都找不到</li>
+    </ul>
+  </div></section>
+
   <section id="term-definition" class="slide"><div>
       <h2>ES 搜尋的最小單位是 Term (Token)</h2>
       <figure>
@@ -222,6 +231,12 @@ Java is a serious language for serious business used by serious grown-ups
         <li>在 ES 就可以靠設計 Tokenizer(Analyzer) 來完成複雜的斷詞</li>
       </ul>
   </div></section>
+
+  <section id="jieba-cover" class="slide cover w subheader mid"><div>
+      <h2>Jieba <br>中文<br>斷詞</h2>
+      <img src="pics/mid.jpg" alt="">
+    </div>
+  </section>
 
   <section id="jieba-intro" class="slide"><div>
       <h2>中文斷詞我們選擇 jieba</h2>
@@ -414,11 +429,11 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
   </div></section>
 
   <section id="moedict-example-json" class="slide"><div>
-    <pre class="language-json"><code># /a/狂狷.json
+    <pre class="language-json medium"><code># /a/狂狷.json
 {"h": [
   {"d": [
-    {"q": ["`論語~．`子路~：「`子~`曰~：『`不得~`中行~`而~`與~`之~，`必~`也~`狂狷~`乎~？`狂~`者~`進取~，`狷~`者~`有~`所~`不為~`也~。』」",
-           "`抱朴子~．`外篇~．`逸民~：「`昔~`狂狷~`華~`士~，`義~`不事~`上~，`隱~`於~`海隅~，`而~`太公~`誅~`之~。`吾子~`沉~`遁~，`不亦~`危~`乎~？」"],
+    {"q": ["`論語~．`子路~：「`子~`曰~：『`不得~`中行~`而~……』」",
+           "`抱朴子~．`外篇~．`逸民~：「`昔~`狂狷~`華~`士~，……」"],
      "f":"`過於~`激進~`與~`過於~`保守~`的~`人~。"}],
    "p": "kuáng juàn",
    "b": "ㄎㄨㄤˊ ㄐㄩㄢˋ",
@@ -452,37 +467,73 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
     </style>
   </section>
 
-<!--
-Lowest term freq = -28.68
-           ['西連寺春菜'] =>                            西連寺春菜[-28.68], log(p) = -28.68
-       ['西', '連寺春菜'] =>                    西[-7.51] 連寺春菜[-28.68], log(p) = -36.19
-       ['西連寺春', '菜'] =>                    西連寺春[-28.68] 菜[-9.28], log(p) = -37.96
-['西', '連', '寺', '春', '菜'] => 西[-7.51] 連[-8.66] 寺[-9.30] 春[-9.09] 菜[-9.28], log(p) = -43.84
-   ['西', '連', '寺春菜'] =>            西[-7.51] 連[-8.66] 寺春菜[-28.68], log(p) = -44.85
-   ['西', '連寺春', '菜'] =>            西[-7.51] 連寺春[-28.68] 菜[-9.28], log(p) = -45.47
-   ['西連寺', '春', '菜'] =>            西連寺[-28.68] 春[-9.09] 菜[-9.28], log(p) = -47.05
-['西', '連', '寺春', '菜'] =>    西[-7.51] 連[-8.66] 寺春[-28.68] 菜[-9.28], log(p) = -54.13
-['西', '連', '寺', '春菜'] =>    西[-7.51] 連[-8.66] 寺[-9.30] 春菜[-28.68], log(p) = -54.15
-['西', '連寺', '春', '菜'] =>    西[-7.51] 連寺[-28.68] 春[-9.09] 菜[-9.28], log(p) = -54.56
-['西連', '寺', '春', '菜'] =>    西連[-28.68] 寺[-9.30] 春[-9.09] 菜[-9.28], log(p) = -56.35
-       ['西連寺', '春菜'] =>                   西連寺[-28.68] 春菜[-28.68], log(p) = -57.36
-       ['西連', '寺春菜'] =>                   西連[-28.68] 寺春菜[-28.68], log(p) = -57.36
-   ['西', '連寺', '春菜'] =>           西[-7.51] 連寺[-28.68] 春菜[-28.68], log(p) = -64.87
-   ['西連', '寺春', '菜'] =>           西連[-28.68] 寺春[-28.68] 菜[-9.28], log(p) = -66.64
-   ['西連', '寺', '春菜'] =>           西連[-28.68] 寺[-9.30] 春菜[-28.68], log(p) = -66.66
--->
+  <section id="increase-corpus" class="slide"><div>
+      <h2>增加文本量更新詞頻</h2>
+      <ul>
+        <li>萌典中的例句跟釋義有固定的格式，詞頻應該從正常文本統計</li>
+        <li>中文維基百科大約有 24 萬條目</li>
+        <ul>
+          <li>原始 XML 文本包含 mediawiki markup（圖表等）</li>
+          <li>維基是世界各地的人共同編輯，各地方言、簡繁交雜</li>
+          <li>借助 <a href="https://github.com/BYVoid/OpenCC">OpenCC</a> 對原始文本簡繁轉換及用語的統一</li>
+        </ul>
+        <li>結合站上產品說明、刊物已經有很足夠的文本</li>
+        <li>加一加文本共約有 100M 個詞，1M 個段落</li>
+      </ul>
+  </div></section>
 
-  <section id="mid-cover" class="slide cover w subheader mid"><div>
-      <h2>Test Cover</h2>
-      <img src="pics/mid.jpg" alt="">
-    </div>
-  </section>
+  <section id="wiki-entry-ex" class="slide cover w"><div>
+      <img src="pics/results/wikipedia_entry_example.png" alt="">
+  </div></section>
+
+  <section id="wiki-process-result" class="slide"><div>
+      <h2>維基百科處理</h2>
+      <ul>
+        <li>使用 gensim 內建的 <code>WikiCorpus</code></li>
+        <li>在 parsing 尚有進步空間</li>
+        <li>在不關閉 jieba 新詞功能時，會增加約 3M 個新詞</li>
+        <li>多數是人名、地名、數字等</li>
+        <li>扣除低詞頻 (&lt;5) 還有約 700K 新詞</li>
+        <li>最後我們並沒有把新詞加回 jieba 中</li>
+      </ul>
+  </div></section>
+
+  <section id="jieba-summary" class="slide"><div>
+      <h2>Jieba 總結與補充</h2>
+      <ul>
+        <li>利用萌典、wiki 與自己的資料，詞條數從 580K 降到 190K</li>
+        <li>Jieba 有提供平行處理斷詞，但我發現自己寫 multiprocess、IPyParallel，把不同的 input 發給很多 jieba worker (embarassingly parallel)，能達到更不錯的加速</li>
+        <li>Jieba cache 是根據 dictionary 路徑去建立的，要小心 multiprocess 不要同時寫入，可以先 initialize 其中一台</li>
+        <li>繁體 HMM model 需要跳坑完成</li>
+      </ul>
+  </div></section>
+
+  <section id="search-summary" class="slide"><div>
+      <h2>ES Search 總結</h2>
+      <ul>
+        <li>ES 能有效地解決搜尋問題，他讓全文搜尋變得非常快速</li>
+        <li>多樣的 analyzer、filter、aggregation，很容易整合搜尋到自己的服務</li>
+        <li>但 ES 在理論本身並沒有 magic</li>
+        <li>斷詞的必要性與取捨，應該以 max retreival 為優先</li>
+        <li>斷詞斷得太多，不代表資料就找不到。<span class="pinkoi">斷得太少才會</span></li>
+        <li>在複合詞的情況，可以考慮使用 index 模式把所有斷詞組合都列出，增加搜尋機會</li>
+      </ul>
+  </div></section>
+
+
+
+<!-- Future work:
+  - 寫一個 wiki parser，考慮到 wiki 詞條、連結等斷詞 hint
+  - 把 wiki 詞條加到 jieba 詞典裡
+  - open source
+  -->
 
   <section id="mid2-cover" class="slide cover w subheader mid2"><div>
-      <h2>中間標題測試</h2>
+      <h2>word2vec</h2>
       <img src="pics/mid2.jpg" alt="">
     </div>
   </section>
+
 
   <section id="not-the-best-way" class="slide"><div>
       <h2>今天提的未必是最好的方法</h2>
