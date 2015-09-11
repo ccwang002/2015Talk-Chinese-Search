@@ -520,33 +520,190 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
       </ul>
   </div></section>
 
-
-
 <!-- Future work:
   - 寫一個 wiki parser，考慮到 wiki 詞條、連結等斷詞 hint
   - 把 wiki 詞條加到 jieba 詞典裡
   - open source
   -->
 
-  <section id="mid2-cover" class="slide cover w subheader mid2"><div>
-      <h2>word2vec</h2>
+  <section id="semantic-search-cover" class="slide cover w subheader mid2"><div>
+      <h2>Semantic Search</h2>
       <img src="pics/mid2.jpg" alt="">
     </div>
   </section>
 
+  <section id="search-chat" class="slide"><div>
+      <h2>仍然有一成的搜尋找不（太）到東西</h2>
+      <ol>
+        <li>使用者想找的是同義的東西，但商品用詞不同</li>
+        <li>下太多關鍵字，站上就沒有這樣的商品</li>
+      </ol>
+      <p>總而言之，不希望他們看到「找不到結果……」</p>
+  </div></section>
 
-  <section id="not-the-best-way" class="slide"><div>
-      <h2>今天提的未必是最好的方法</h2>
+  <section id="semantic-search" class="slide"><div>
+      <h2>語意搜尋</h2>
       <ul>
-        <li>不要一開始就「砍掉重練」</li>
-        <li>簡單的方法能動就用簡單的</li>
-        <li>20% 的工完成 80% 的效果</li>
-      </ul>
-      <ul>
-        <li>「咦你剛剛說用 KNN，但那不是………為什麼不用……」</li>
-        <li>「因為它能動，而且效果能接受」</li>
+        <li>有沒有辦法把每個單字用數學的方式表示</li>
+        <li></li>
+        <li></li>
+        <li></li>
       </ul>
   </div></section>
+
+  <section id="word2vec-theory-cbow" class="slide twocol"><div>
+      <div class="left">
+      <h2>Word2vec theory</h2>
+      <ul>
+        <li>一個詞會被轉換到 \(V\) 維度的空間中，\(V \in [200, 1000]\)</li>
+        <li>這個轉換透過給的文本前後文去學習，例如 \( C = 10\) 表示看了前後 5 個字</li>
+        <li>Unsupervised：只要一直餵給他斷好詞的文本就可以了</li>
+        <li>使用 wiki，第一次 iteration 就有效</li>
+      </ul>
+      </div>
+      <div class="right">
+      <div class="citation">
+        <img src="pics/external/word2vec_cbow.png" alt="">
+        <p>Ref: <a href="http://alexminnaar.com/word2vec-tutorial-part-ii-the-continuous-bag-of-words-model.html">Word2vec tutorial (CBOW)</a></p>
+      </div>
+      </div>
+    </div>
+    <style>
+      #word2vec-theory-cbow.twocol .left {
+        width: 55%;
+      }
+      #word2vec-theory-cbow .citation {
+        position: absolute;
+        top: 100px;
+        right: 75px;
+      }
+      #word2vec-theory-cbow .citation img {
+        width: 380px;
+      }
+    </style>
+  </section>
+
+  <section id="word2vec-space" class="slide twocol-lr"><div>
+    <div class="left">
+    </div>
+    <div class="right">
+      <div class="citation">
+        <img src="pics/results/word2vec_space.png" alt="">
+      </div>
+    </div>
+  </div></section>
+
+  <section id="word2vec-vector" class="slide twocol-lr"><div>
+    <div class="left">
+    </div>
+    <div class="right">
+      <div class="citation">
+        <img src="pics/results/word2vec_vector.png" alt="">
+      </div>
+    </div>
+  </div></section>
+
+  <section id="word2vec-vector-diff" class="slide twocol-lr"><div>
+    <div class="left">
+    </div>
+    <div class="right">
+      <div class="citation">
+        <img src="pics/external/word2vec_vecdiff.gif" alt="">
+        <p>Ref: <a href="http://google-opensource.blogspot.tw/2013/08/learning-meaning-behind-words.html">Google Open Source Blog</a></p>
+      </div>
+    </div>
+  </div></section>
+
+  <section id="word2vec-wiki" class="slide twocol"><div>
+    <h2 class="tighter">使用中文維基的 word2vec</h2>
+    <div class="left">
+      <pre class="language-python medium"><code>m.most_similar(['項鍊'])
+墜子       	0.798
+項鏈       	0.736
+墜        	0.707
+墜飾       	0.684
+鏈長       	0.682
+鎖骨       	0.681
+鏈        	0.664
+鍊        	0.662
+墬        	0.650
+純銀       	0.649</code></pre>
+    </div>
+    <div class="right">
+      <pre class="language-python medium"><code>m.most_similar(['背包'])
+束口       	0.713
+圓筒       	0.617
+書包       	0.591
+背袋       	0.587
+側        	0.582
+中型       	0.572
+手提包       0.571
+肩背       	0.571
+後背       	0.544
+斜背       	0.539</code></pre>
+    </div>
+  </div></section>
+
+  <section id="word2vec-wiki-contd" class="slide twocol"><div>
+    <div class="left">
+      <pre class="language-python medium"><code>m.most_similar(['高山茶'])
+烏龍茶      	0.722
+阿里山      	0.715
+茶        	0.708
+蜜香       	0.685
+金萱       	0.683
+包種茶      	0.681
+紅茶       	0.681
+高山       	0.677
+烏龍       	0.675
+茶農       	0.670</code></pre>
+    </div>
+    <div class="right">
+      <pre class="language-python medium"><code>m.most_similar(['高山', '茶'])
+阿里山      	0.837
+烏龍       	0.818
+烏龍茶      	0.795
+紅茶       	0.794
+金萱       	0.786
+茶葉       	0.769
+高山茶      	0.765
+綠茶       	0.752
+茶園       	0.742
+手採       	0.741</code></pre>
+    </div>
+  </div></section>
+
+  <section id="prod-demo-search-suggest" class="slide"><div>
+      <h2>Demo</h2>
+    <img style="width: 100%; top: 400px;" class="place" src="pics/results/prod_search_suggestiong_demo.png" alt="">
+  </div></section>
+
+  <section id="prod-demo-search-similar" class="slide twocol"><div>
+      <h2>Demo 2</h2>
+      <div class="left">
+        <p>Query: 寬肩點點連身洋裝</p>
+        <ul>
+          <li><a href="http://www.pinkoi.com/product/1M9o7QN4">大點點罩衫洋裝</a></li>
+          <li><a href="http://www.pinkoi.com/product/1muFWiOp">雙色點點棉洋裝＿紫黃款</a></li>
+          <li>點點蝴蝶結背心長洋裝</li>
+          <li>長長背心裙洋裝</li>
+          <li>點點洋裝</li>
+        </ul>
+      </div>
+      <div class="right">
+        <div class="citation">
+          <img src="pics/results/pinkoi_1M9o7QN4.jpg" alt="">
+          <img src="pics/results/pinkoi_1muFWiOp.jpg" alt="">
+          <p>圖左：<a href="http://www.pinkoi.com/product/1M9o7QN4">設計師：turn turn</a> | 圖右：<a href="http://www.pinkoi.com/product/1M9o7QN4">設計師：y1,hsuan</a></p>
+        </div>
+      </div>
+    </div>
+    <style>
+      #prod-demo-search-similar .right img {
+        width: 190px;
+      }
+    </style>
+  </section>
 
   <section id="pinkoi-hiring" class="slide cover"><div>
       <img src="pics/pinkoi_hiring.jpg" alt="" />
@@ -587,6 +744,19 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
     }
   </style>
   </section>
+
+  <section id="not-the-best-way" class="slide"><div>
+      <h2>今天提的未必是最好的方法</h2>
+      <ul>
+        <li>不要一開始就「砍掉重練」</li>
+        <li>簡單的方法能動就用簡單的</li>
+        <li>20% 的工完成 80% 的效果</li>
+      </ul>
+      <ul>
+        <li>「咦你剛剛說用 KNN，但那不是………為什麼不用……」</li>
+        <li>「因為它能動，而且效果能接受」</li>
+      </ul>
+  </div></section>
 
   <!-- End Slide -->
   <section id='end' class='slide cover shout w'><div>
