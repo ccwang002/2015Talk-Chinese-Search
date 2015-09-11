@@ -17,7 +17,7 @@
   <!-- Header in overview -->
   <header class="caption">
     <h1>Chinese Search Sharing</h1>
-    <p style="line-height: 32px; padding-top:15px;"><a href="http://liang2.tw">Liang Bo Wang (亮亮)</a>, 2015-07-14</p>
+    <p style="line-height: 32px; padding-top:15px;"><a href="http://liang2.tw">Liang Bo Wang (亮亮)</a>, 2015-09-14</p>
   </header>
   <!-- Cover slide -->
   <section id="cover" class="slide cover w"><div>
@@ -121,13 +121,22 @@
   <section id="background" class="slide"><div>
       <h2>背景介紹</h2>
       <ul>
-        <li>敝公司用 ElasticSearch (ES) 做站上商品的搜尋</li>
+        <li><img class="logo" src="pics/pinkoi.png" alt="Pinkoi"> 用 ElasticSearch (ES) 做站上商品的搜尋</li>
         <li>多數亞洲文字（中、日、泰）都需要額外斷詞處理</li>
         <li>內建有一個 ICU（International Components for Unicode）Analyzer，<br>基本能動但效果有限（參考 <a href="http://userguide.icu-project.org/boundaryanalysis">ICU - Text Boundary Analysis</a>）</li>
         <li>ES 改版之快，估計會被海放到 2.0……反正它海放了一堆第三方套件，所以想升也沒辦法</li>
         <li>關於 ES Analyzer 的使用可以參考<a href="https://www.elastic.co/blog/found-text-analysis-part-1">官網教學</a></li>
       </ul>
-  </div></section>
+  </div>
+    <style>
+      #background .logo {
+        width: 1.5em;
+        height: 1.5em;
+        vertical-align: bottom;
+        padding-bottom: 0.25em;
+      }
+    </style>
+  </section>
 
   <section id="es-basics-cover" class="slide cover w subheader mid"><div>
       <h2>ES Search Basics</h2>
@@ -142,6 +151,7 @@
       <li>在「○○」的結果中，不要出現不相關的ｘｘ</li>
       <li>寧可有些ｘｘ也不要○○都找不到</li>
     </ul>
+    <p>找「蘋果派」的時候最前面的搜尋結果應該都是蘋果派，應該不會有香蕉船，也希望沒有蘋果塔，但寧可有些蘋果塔也不要連蘋果派都找不到</p>
   </div></section>
 
   <section id="term-definition" class="slide"><div>
@@ -159,7 +169,7 @@
 
   <section id="how-es-search" class="slide"><div>
       <h2>所以 ES (Lucene) 是怎麼搜尋的？</h2>
-      <p>零魔法，最核心的概念是 <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a>。可以自己做一個。細節見附錄。</p>
+      <p>零魔法，最核心的概念是 <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a>。可以自己做一個。</p>
       <ul>
         <li><strong>Term Frequency (TF)</strong>：在 document 中出現的次數多寡</li>
         <li><strong>Inverse Document Frequency (IDF)</strong>：這 term 總共在多少 document 中出現，出現太頻繁的（we, you）的權重較低</li>
