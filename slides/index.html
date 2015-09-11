@@ -533,21 +533,26 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
   </section>
 
   <section id="search-chat" class="slide"><div>
-      <h2>仍然有一成的搜尋找不（太）到東西</h2>
+      <h2>仍有一成的搜尋找不（太）到結果</h2>
       <ol>
-        <li>使用者想找的是同義的東西，但商品用詞不同</li>
+        <li>其實找到使用者想找的東西了</li>
+        <li>使用者想找的是同義的商品，但用詞不同</li>
         <li>下太多關鍵字，站上就沒有這樣的商品</li>
       </ol>
-      <p>總而言之，不希望他們看到「找不到結果……」</p>
+      <p>也許沒有完全一樣的，但也許<span class="pinkoi">很像的</span></p>
   </div></section>
 
   <section id="semantic-search" class="slide"><div>
-      <h2>語意搜尋</h2>
+      <h2>語意搜尋：怎麼說很像？</h2>
       <ul>
-        <li>有沒有辦法把每個單字用數學的方式表示</li>
-        <li></li>
-        <li></li>
-        <li></li>
+        <li>模糊的相似關係必須被量化</li>
+        <li>也許不用很準，最好完全不需要人工標注</li>
+        <li>有沒有辦法把每個 term 定量？\[
+          m(t): t \rightarrow \mathbf{R}^v, t \in \left\{\text{所有可能的中文詞}\right\}
+          \]</li>
+        <li>在 \(\mathbf{R}^v\) 空間能決定兩個詞像不像 \[
+          f(m_1, m_2): \mathbf{R}^v \times \mathbf{R}^v \rightarrow [0, 1]
+        \]</li>
       </ul>
   </div></section>
 
@@ -558,7 +563,7 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
         <li>一個詞會被轉換到 \(V\) 維度的空間中，\(V \in [200, 1000]\)</li>
         <li>這個轉換透過給的文本前後文去學習，例如 \( C = 10\) 表示看了前後 5 個字</li>
         <li>Unsupervised：只要一直餵給他斷好詞的文本就可以了</li>
-        <li>使用 wiki，第一次 iteration 就有效</li>
+        <li>使用 wiki，一次 iteration 後就有效果</li>
       </ul>
       </div>
       <div class="right">
@@ -583,28 +588,50 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
     </style>
   </section>
 
-  <section id="word2vec-space" class="slide twocol-lr"><div>
+  <section id="word2vec-space" class="slide twocol"><div>
+    <h2>Word2vec 空間特性</h2>
     <div class="left">
+      <ul>
+        <li>概念上接近的東西會很接近</li>
+        <li>可能因為他們在文本中經常一起出現、在文本中的位置很接近</li>
+        <li>雖然未必精準（鑰匙、門鎖、門、木板）</li>
+      </ul>
     </div>
     <div class="right">
       <div class="citation">
-        <img src="pics/results/word2vec_space.png" alt="">
+        <img style="width: 420px;" src="pics/results/word2vec_space.png" alt="">
+        <p>實際上座標空間有 V 維，這個可以想成映射在某個平面空間時</p>
       </div>
     </div>
   </div></section>
 
-  <section id="word2vec-vector" class="slide twocol-lr"><div>
+  <section id="word2vec-vector" class="slide twocol"><div>
     <div class="left">
+      <ul>
+        <li>每個維度大致上控制「某個概念」</li>
+        <li>Unsupervised learning 並無法掌控、指定哪個維度應該是什麼</li>
+        <li>概念可以相加</li>
+        <li>近年 LSTM RNN 這類模型也許可以做得更好，但相較而言， word2vec 架構簡單多了</li>
+      </ul>
     </div>
     <div class="right">
       <div class="citation">
         <img src="pics/results/word2vec_vector.png" alt="">
+        <p>註：這是很理想的狀況，現實中可能不會這麼理想，相加的概念會被高頻的單字 dominate。例如「○○茶」基本上就是「茶」，除非○○的詞頻夠足以讓 word2vec 的向量夠明確，例如「高山茶」就能與「茶」有所區別；像「伯爵茶」的「伯爵」概念就會被實際的「伯爵」所影響。<br>這時候就需要更精細的斷詞系統。</p>
       </div>
     </div>
   </div></section>
 
   <section id="word2vec-vector-diff" class="slide twocol-lr"><div>
     <div class="left">
+    <p>還有一些很有趣的特性</p>
+    <p>\[
+    \begin{align*}
+      &m_{東京} - m_{日本} \\
+      \approx& m_{柏林} - m_{德國}
+    \end{align*}
+    \]</p>
+    <p>因為維基的敘述像「東京是日本的首都」、「柏林是德國的首都」</p>
     </div>
     <div class="right">
       <div class="citation">
@@ -673,18 +700,140 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
     </div>
   </div></section>
 
-  <section id="prod-demo-search-suggest" class="slide"><div>
-      <h2>Demo</h2>
-    <img style="width: 100%; top: 400px;" class="place" src="pics/results/prod_search_suggestiong_demo.png" alt="">
+  <section id="word2vec-wiki-examples" class="slide twocol"><div>
+      <div class="left">
+      <pre class="language-python medium"><code>m.most_similar(['白毫', '烏龍'])
+烏龍茶      	0.861
+金萱       	0.809
+凍頂       	0.804
+紅茶       	0.788
+綠茶       	0.780
+阿里山       0.779
+蜜香       	0.763
+青心       	0.759
+甘潤       	0.747
+東方美人茶    0.744</code></pre>
+      </div>
+      <div class="right">
+      <pre class="language-python medium"><code>m.most_similar(['藍色'])
+綠色       	0.870
+紫色       	0.862
+黃色       	0.851
+粉色       	0.827
+紅色       	0.814
+桃紅色      	0.798
+橘色       	0.794
+藍        	0.785
+白色       	0.767
+淺        	0.766</code></pre>
+      </div>
   </div></section>
 
-  <section id="prod-demo-search-similar" class="slide twocol"><div>
-      <h2>Demo 2</h2>
+  <section id="word2vec-wiki-examples-otaku" class="slide twocol"><div>
       <div class="left">
-        <p>Query: 寬肩點點連身洋裝</p>
+      <pre class="language-python medium"><code>m.most_similar(['涼宮', '春日'])
+朝比奈實     	0.660
+小涼宮      	0.653
+有希       	0.635
+虛妹       	0.630
+nyoron   	0.593
+阿虛       	0.592
+小鶴屋      	0.583
+喜綠江      	0.574
+屋學       	0.564
+實玖瑠的     	0.559</code></pre>
+      </div>
+      <div class="right">
+      <pre class="language-python medium"><code>m.most_similar(['玲音'])
+狼雨       	0.564
+texhnolyze	0.561
+flcl     	0.558
+clamp    	0.542
+沙羅鬼      	0.539
+寶魔       	0.535
+亡念       	0.534
+碧奇魂      	0.527
+chobits  	0.526
+蟲師       	0.526</code></pre>
+      </div>
+      <div class="sidenote grey"><p>FYI: <a href="http://knowyourmeme.com/memes/nyoron">nyoron</a>、<a href="https://en.wikipedia.org/wiki/Texhnolyze">texhnolyze</a><br>wiki 很宅der</p></div>
+    </div>
+    <style>
+      #word2vec-wiki-examples-otaku .sidenote p {
+        margin-bottom: 5px;
+        line-height: 1.5em;
+        text-align: right;
+      }
+      #word2vec-wiki-examples-otaku .sidenote {
+        position: absolute;
+        width: 300px;
+        right: 120px;
+        bottom: 25px;
+        line-height: 1.5em;
+        font-size: 20px;
+        padding: 0 10px;
+      }
+    </style>
+  </section>
+
+  <section id="word2vec-wiki-examples-country" class="slide twocol"><div>
+      <div class="left">
+      <p>在論文上看得到的比較</p>
+      <pre class="language-python medium"><code>紐約 - 美國 = ? - 英國
+倫敦       	0.837
+逛        	0.817
+一線       	0.816
+
+北京 - 中國 = ? - 德國
+柏林       	0.792
+榮獲       	0.762
+旅德       	0.746</code></pre>
+      </div>
+      <div class="right">
+      <p>WTF 系列</p>
+      <pre class="language-python medium"><code>宅男 - 男生 = ? - 女生
+正妹       	0.836
+宅女       	0.829
+宅男女神     	0.823
+
+腐女 - 女生 = ? - 男生
+御宅族      	0.779
+傲嬌       	0.750
+yaoi     	0.749</code></pre>
+      </div>
+  </div></section>
+
+  <section id="prod-semantic-search" class="slide twocol"><div>
+      <h2>使用 word2vec 在搜尋</h2>
+      <div class="left">
         <ul>
-          <li><a href="http://www.pinkoi.com/product/1M9o7QN4">大點點罩衫洋裝</a></li>
-          <li><a href="http://www.pinkoi.com/product/1muFWiOp">雙色點點棉洋裝＿紫黃款</a></li>
+          <li>即便在字串搜尋的情況沒有結果，仍然能找它相近的</li>
+          <li>word2vec 使用 <a href="https://radimrehurek.com/gensim/">gensim</a> 實作</li>
+          <ul>
+            <li>尚末支援加新詞的功能。<br>意即，新文本中的新詞會自動被忽略而沒有 mapping</li>
+            <li>本功能尚在 <a href="https://github.com/piskvorky/gensim/pull/435">pull request</a> 中</li>
+          </ul>
+        </ul>
+      </div>
+      <div class="right">
+        <div class="citation">
+          <img style="width: 120%; height: 120%;" src="pics/results/word2vec_similar_search.png" alt="">
+        </div>
+      </div>
+  </div></section>
+
+  <section id="prod-demo-search-suggest" class="slide"><div>
+      <h2>Demo</h2>
+    <img style="width: 100%; top: 360px;" class="place" src="pics/results/prod_search_suggestiong_demo.png" alt="">
+  </div></section>
+
+  <section id="prod-demo-search-similar" class="slide twocol-lr"><div>
+      <div class="left">
+        <h2>Demo 2</h2>
+        <p class="pinkoi">🔍 寬肩點點連身洋裝</p>
+        <ul>
+          <li>大點點罩衫洋裝</li>
+          <li>雙色點點棉洋裝</li>
           <li>點點蝴蝶結背心長洋裝</li>
           <li>長長背心裙洋裝</li>
           <li>點點洋裝</li>
@@ -700,7 +849,47 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
     </div>
     <style>
       #prod-demo-search-similar .right img {
-        width: 190px;
+        width: 250px;
+      }
+    </style>
+  </section>
+
+  <section id="word2vec-summary" class="slide"><div>
+      <h2>Word2vec 總結</h2>
+      <ul>
+        <li>我們的出發點：改善找不（太）到東西的那群人</li>
+        <li>但 word2vec 提供一個簡單、有效的語意 feature</li>
+        <li>也許不是最準的 / 用的模型也是最簡單的</li>
+        <li>靠 benchmark、行為分析來判斷是否需要改進</li>
+      </ul>
+  </div></section>
+
+  <section id="not-the-best-way" class="slide"><div>
+      <h2>今天用的未必是最好的方法</h2>
+      <p>「咦你剛剛說用△△△，但那不是………為什麼不用○○○效果更好」</p>
+      <ul>
+        <li>因為△△△能動，而且效果能接受，就沒繼續做下去了</li>
+        <li>簡單的方法能動就用簡單的</li>
+        <li>用兩成的工完成六成的效果</li>
+        <li>也不要一開始就想到 big data、deep learning</li>
+      </ul>
+  </div></section>
+
+  <section id="pinkoi-whats-next" class="slide"><div>
+      <h2>What's next for <img class="logo" src="pics/pinkoi.png" alt="Pinkoi"> ?</h2>
+      <ul>
+        <li>アジア最大級のハンドメイド、デザイン商品販売サイトです。</li>
+        <li>Asia's largest online marketplace for unique and original design goods.</li>
+        <li>นเว็บไซต์ซื้อขายงานดีไซน์ออนไลน์ที่ใหญ่ที่สุดในเอเชีย</li>
+        <li>亚洲领先的设计商品购物网站</li>
+      </ul>
+      <p class="pinkoi">我們關心並努力改善來自各地的使用者體驗</p>
+    </div>
+    <style>
+      #pinkoi-whats-next .logo {
+        width: 1.5em;
+        height: 1.5em;
+        vertical-align: bottom;
       }
     </style>
   </section>
@@ -745,18 +934,6 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
   </style>
   </section>
 
-  <section id="not-the-best-way" class="slide"><div>
-      <h2>今天提的未必是最好的方法</h2>
-      <ul>
-        <li>不要一開始就「砍掉重練」</li>
-        <li>簡單的方法能動就用簡單的</li>
-        <li>20% 的工完成 80% 的效果</li>
-      </ul>
-      <ul>
-        <li>「咦你剛剛說用 KNN，但那不是………為什麼不用……」</li>
-        <li>「因為它能動，而且效果能接受」</li>
-      </ul>
-  </div></section>
 
   <!-- End Slide -->
   <section id='end' class='slide cover shout w'><div>
