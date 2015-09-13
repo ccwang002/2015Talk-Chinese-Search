@@ -138,12 +138,6 @@
     </style>
   </section>
 
-  <section id="es-basics-cover" class="slide cover w subheader mid"><div>
-      <h2>ES Search Basics</h2>
-      <img src="pics/mid.jpg" alt="">
-    </div>
-  </section>
-
   <section id="ideal-search" class="slide"><div>
     <h2>搜尋的基本要求</h2>
     <ul>
@@ -153,6 +147,12 @@
     </ul>
     <p>找「蘋果派」的時候最前面的搜尋結果應該都是蘋果派，應該不會有香蕉船，也希望沒有蘋果塔，但寧可有些蘋果塔也不要連蘋果派都找不到</p>
   </div></section>
+
+  <section id="es-basics-cover" class="slide cover w subheader mid"><div>
+      <h2>ES Search Basics</h2>
+      <img src="pics/mid.jpg" alt="">
+    </div>
+  </section>
 
   <section id="term-definition" class="slide"><div>
       <h2>ES 搜尋的最小單位是 Term (Token)</h2>
@@ -167,9 +167,28 @@
     </div>
   </section>
 
+  <section id="es-custom-analyzer" class="slide"><div>
+    <div class="citation">
+      <img src="pics/external/es_custom_analyzer.png" alt="">
+      <p>Ref: <a href="https://www.elastic.co/blog/found-text-analysis-part-1">All About Analyzers, Part One, ES official blog</a></p>
+    </div>
+  </div>
+    <style>
+    #es-custom-analyzer .citation img {
+      width: auto;
+      height: 600px;
+    }
+    #es-custom-analyzer .citation {
+      position: absolute;
+      top: 5px;
+      left: 250px;
+    }
+    </style>
+  </section>
+
   <section id="how-es-search" class="slide"><div>
-      <h2>所以 ES (Lucene) 是怎麼搜尋的？</h2>
-      <p>零魔法，最核心的概念是 <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a>。可以自己做一個。</p>
+      <h2>ES (Lucene) 是怎麼搜尋的？</h2>
+      <p>零魔法，最核心的概念是 <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a>。可以<a href="https://github.com/ccwang002/2015Talk-Chinese-Search/blob/master/code/tf_idf.py">自己做一個</a>。</p>
       <ul>
         <li><strong>Term Frequency (TF)</strong>：在 document 中出現的次數多寡</li>
         <li><strong>Inverse Document Frequency (IDF)</strong>：這 term 總共在多少 document 中出現，出現太頻繁的（we, you）的權重較低</li>
@@ -521,12 +540,13 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
   <section id="search-summary" class="slide"><div>
       <h2>ES Search 總結</h2>
       <ul>
-        <li>ES 能有效地解決搜尋問題，他讓全文搜尋變得非常快速</li>
+        <li>ES 讓全文搜尋變得非常快速，但理論本身並沒有 magic</li>
         <li>多樣的 analyzer、filter、aggregation，很容易整合搜尋到自己的服務</li>
-        <li>但 ES 在理論本身並沒有 magic</li>
         <li>斷詞的必要性與取捨，應該以 max retreival 為優先</li>
         <li>斷詞斷得太多，不代表資料就找不到。<span class="pinkoi">斷得太少才會</span></li>
-        <li>在複合詞的情況，可以考慮使用 index 模式把所有斷詞組合都列出，增加搜尋機會</li>
+        <li>複合詞可考慮使用 index 模式列出所有斷詞組合</li>
+        <li>Jieba analyzer <span class="pinkoi">沒有寫 Tokenizer 無法擴充</span>（ik 也無法，smartcn 可）<br>
+        大家快跳坑！</li>
       </ul>
   </div></section>
 
