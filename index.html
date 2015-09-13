@@ -138,12 +138,6 @@
     </style>
   </section>
 
-  <section id="es-basics-cover" class="slide cover w subheader mid"><div>
-      <h2>ES Search Basics</h2>
-      <img src="pics/mid.jpg" alt="">
-    </div>
-  </section>
-
   <section id="ideal-search" class="slide"><div>
     <h2>搜尋的基本要求</h2>
     <ul>
@@ -154,11 +148,17 @@
     <p>找「蘋果派」的時候最前面的搜尋結果應該都是蘋果派，應該不會有香蕉船，也希望沒有蘋果塔，但寧可有些蘋果塔也不要連蘋果派都找不到</p>
   </div></section>
 
+  <section id="es-basics-cover" class="slide cover w subheader mid"><div>
+      <h2>ES Search Basics</h2>
+      <img src="pics/mid.jpg" alt="">
+    </div>
+  </section>
+
   <section id="term-definition" class="slide"><div>
       <h2>ES 搜尋的最小單位是 Term (Token)</h2>
       <figure>
         <blockquote>
-          <p>Who controls the past controls the future. Who controls the present controls the past. <span class="author">- 1984, George Orwell</span></p>
+          <p>Who controls the past controls the future. Who controls the present controls the past. <span class="author">&mdash; 1984, George Orwell</span></p>
         </blockquote>
       </figure>
       <p class="tighter">會被 ES Tokenizer 轉換成 Who / controls / the / past / controls / the / future / Who / controls / the / present / controls / the / past。<br>
@@ -167,9 +167,28 @@
     </div>
   </section>
 
+  <section id="es-custom-analyzer" class="slide"><div>
+    <div class="citation">
+      <img src="pics/external/es_custom_analyzer.png" alt="">
+      <p>Ref: <a href="https://www.elastic.co/blog/found-text-analysis-part-1">All About Analyzers, Part One, ES official blog</a></p>
+    </div>
+  </div>
+    <style>
+    #es-custom-analyzer .citation img {
+      width: auto;
+      height: 600px;
+    }
+    #es-custom-analyzer .citation {
+      position: absolute;
+      top: 5px;
+      left: 250px;
+    }
+    </style>
+  </section>
+
   <section id="how-es-search" class="slide"><div>
-      <h2>所以 ES (Lucene) 是怎麼搜尋的？</h2>
-      <p>零魔法，最核心的概念是 <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a>。可以自己做一個。</p>
+      <h2>ES (Lucene) 是怎麼搜尋的？</h2>
+      <p>零魔法，最核心的概念是 <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a>。可以<a href="https://github.com/ccwang002/2015Talk-Chinese-Search/blob/master/code/tf_idf.py">自己做一個</a>。</p>
       <ul>
         <li><strong>Term Frequency (TF)</strong>：在 document 中出現的次數多寡</li>
         <li><strong>Inverse Document Frequency (IDF)</strong>：這 term 總共在多少 document 中出現，出現太頻繁的（we, you）的權重較低</li>
@@ -231,7 +250,7 @@ Java is a serious language for serious business used by serious grown-ups
       <h2>中文的斷詞應該像這樣</h2>
       <figure>
         <blockquote class="cjk">
-          <p>過去很近，近的就在眼前，以致於你一集中焦距就看出了它的遠。<br><span class="author">張惠菁。《你不相信的事》</span></p>
+          <p>過去很近，近的就在眼前，以致於你一集中焦距就看出了它的遠。<br><span class="author">&mdash; 張惠菁。《你不相信的事》</span></p>
         </blockquote>
       </figure>
       <ul>
@@ -500,7 +519,7 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
       <h2>維基百科處理</h2>
       <ul>
         <li>使用 gensim 內建的 <code>WikiCorpus</code></li>
-        <li>在 parsing 尚有進步空間</li>
+        <li>在 parsing 有很大的進步空間（跳坑！）</li>
         <li>在不關閉 jieba 新詞功能時，會增加約 3M 個新詞</li>
         <li>多數是人名、地名、數字等</li>
         <li>扣除低詞頻 (&lt;5) 還有約 700K 新詞</li>
@@ -521,12 +540,13 @@ cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
   <section id="search-summary" class="slide"><div>
       <h2>ES Search 總結</h2>
       <ul>
-        <li>ES 能有效地解決搜尋問題，他讓全文搜尋變得非常快速</li>
+        <li>ES 讓全文搜尋變得非常快速，但理論本身並沒有 magic</li>
         <li>多樣的 analyzer、filter、aggregation，很容易整合搜尋到自己的服務</li>
-        <li>但 ES 在理論本身並沒有 magic</li>
         <li>斷詞的必要性與取捨，應該以 max retreival 為優先</li>
         <li>斷詞斷得太多，不代表資料就找不到。<span class="pinkoi">斷得太少才會</span></li>
-        <li>在複合詞的情況，可以考慮使用 index 模式把所有斷詞組合都列出，增加搜尋機會</li>
+        <li>複合詞可考慮使用 index 模式列出所有斷詞組合</li>
+        <li>Jieba analyzer <span class="pinkoi">沒有寫 Tokenizer 無法擴充</span>（ik 也無法，smartcn 可）<br>
+        大家快跳坑！</li>
       </ul>
   </div></section>
 
@@ -966,6 +986,20 @@ yaoi     	0.749</code></pre>
       }
     </style>
   </section>
+
+  <section id="my-future-goal" class="slide"><div>
+      <blockquote class="place c cjk" lang="en"><p lang="zh" dir="ltr">以前 COSCUP 結束後，會眾紛紛撰寫網誌，紀錄一年一度的盛會，現在參與人數這麼多，實際紀錄的人卻更少，而且鮮少是著墨議題本身，反過來說，日本朋友紀錄的內容還比台灣會眾清楚 (?)</p>&mdash; Jim Huang (@jserv) <a href="https://twitter.com/jserv/status/634150416171687936">August 19, 2015</a></blockquote>
+  </div></section>
+
+  <section id="in-the-future-we-trust" class="slide"><div>
+      <figure>
+        <blockquote class="cjk">
+          <p>　　會成為勇敢、強壯而溫柔的人嗎？會成為絕頂聰明，卻憤世嫉俗的人嗎？或者，會像絕大多數的人一樣，成為一個專業、庸俗、社會化完全的「大人」？我們自少年時極力奮鬥的，不就是要抗拒這樣的馴化，拒絕體制將我們抹壓成同一張臉孔？……<br>
+            　　……我希望他們每個人都能從青春裡直接長成正直而勇敢的大人。能不能不要忘記我們曾經衝撞過的理想，流的眼淚，對共同體的愛，為彼此寫的詩，把那種熱情和感動在長長的歲月裡捶打成綿長不絕的，日夜不竭的，為台灣這塊土地的奮鬥？<br><span class="author">&mdash; 許菁芳。<a href="http://chingfanghsu.blogspot.ca/2014/11/the-ntu-brothers.html">《The NTU Brothers / 台大男生》</a></span></p>
+        </blockquote>
+      </figure>
+  </div></section>
+
 
   <!-- END OF SLIDE CONTENT -->
   <p class="badge"><a href="https://github.com/ccwang002/2015Talk-Chinese-Search" target="_blank">Fork me on Github</a></p>
