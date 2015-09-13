@@ -30,11 +30,12 @@
   <!-- Header in overview -->
   <header class="caption">
     <h1>Chinese Search Sharing</h1>
-    <p style="line-height: 32px; padding-top:15px;"><a href="http://liang2.tw">Liang Bo Wang (亮亮)</a>, 2015-09-14</p>
+    <p style="line-height: 32px; padding-top:15px;"><a href="http://liang2.tw">Liang Bo Wang (亮亮)</a>, 2015-09-14<br>
+    <a href="./index.html">繁体完整版本</a></p>
   </header>
   <!-- Cover slide -->
   <section id="cover" class="slide cover w"><div>
-    <h3 id="talk-subheader">PyCon China 上海2015</h3>
+    <h3 id="talk-subheader">PyCon China 广州2015</h3>
     <h2 id="talk-header" class="place">中文搜索经验分享</h2>
     <p id="talk-author">
       By <a href="http://liang2.tw" target="_blank">Liang<sup>2</sup></a> under CC 4.0 BY license
@@ -117,6 +118,9 @@
         <li>Former intern at Microsoft Research Asia</li>
         <li>Intern at <strong><a href="http://www.pinkoi.com/about" class="pinkoi">Pinkoi</a></strong></li>
       </ul>
+      <ul>
+        <li><a href="./index.html">原始繁体长版本</a>，分析为繁体情境</li>
+      </ul>
       <img id="protrait" src="pics/me.jpg" class="place r"alt="">
     </div>
     <style>
@@ -163,7 +167,7 @@
       <li>在「○○」的结果中，不要出现不相关的ｘｘ</li>
       <li>宁可有些ｘｘ也不要○○都找不到</li>
     </ul>
-    <p>找「苹果派」的时候最前面的搜索结果应该都是苹果派，应该不会有香蕉船，也希望没有苹果塔，但宁可有些苹果塔也不要连苹果派都找不到</p>
+    <p>找「苹果派」的时候最前面的搜索结果应该都是苹果派，不能有香蕉船，最好没有苹果塔。但宁可有些苹果塔也不要连苹果派都找不到</p>
   </div></section>
 
   <section id="term-definition" class="slide"><div>
@@ -180,8 +184,8 @@
   </section>
 
   <section id="how-es-search" class="slide"><div>
-      <h2>所以 ES (Lucene) 是怎么搜索的？</h2>
-      <p>零魔法，最核心的概念是 <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a>。可以自己做一个。</p>
+      <h2>ES (Lucene) 如何搜索的？</h2>
+      <p>核心的概念是 <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a>。可以自己做一个。</p>
       <ul>
         <li><strong>Term Frequency (TF)</strong>：在 document 中出现的次数多寡</li>
         <li><strong>Inverse Document Frequency (IDF)</strong>：这 term 总共在多少 document 中出现，出现太频繁的（we, you）的权重较低</li>
@@ -201,23 +205,6 @@ Top 3 similar documents are:
 d1: 复古单宁帆布后双背包 [sim=0.4969]
 d3: 蓝色石纹斜背包 [sim=0.3262]
 d2: 米色帆布横式侧背包 [sim=0.3017]</code></pre>
-  </div></section>
-
-  <section id="tf-idf-inner" class="slide"><div>
-      <h2>Under the hood - cos similarity</h2>
-      <pre class="language-python small"><code>q  = {后: 1.00, 背: 1.00, 包: 1.00}
-
-d1 = {复: 2.25, 古: 2.25, 单: 1.85, <mark>宁: 2.25</mark>, 帆: 1.34, <mark>布: 1.00</mark>,
-      后: 2.25, 双: 2.25, 背: 1.56, 包: 1.34}
-d2 = {米: 2.25, 色: 1.85, 帆: 1.34, 布: 1.00, 横: 2.25, 式: 2.25,
-      侧: 2.25, 背: 1.56, 包: 1.34}
-d3 = {蓝: 2.25, 色: 1.85, 石: 2.25, 纹: 1.85, 斜: 2.25, 背: 1.56, 包: 1.34}
-d4 = {帆: 1.34, 布: 1.00, 眼: 1.85, 镜: 2.25, 盒: 2.25}
-d5 = {鳄: 2.25, 鱼: 2.25, 帆: 1.34, 布: 1.00, 笔: 2.25, 袋: 2.25}
-d6 = {拼: 2.25, 木: 2.25, 纹: 1.85, 布: 1.00, 质: 2.25, 文: 2.25, 库: 2.25,
-      书: 2.25, 衣: 2.25}
-d7 = {单: 1.85, 眼: 1.85, 相: 2.25, 机: 2.25, 用: 2.25, 亮: 2.25, 彩: 2.25,
-      防: 2.25, 水: 2.25, 包: 1.34, 布: 1.00}</code></pre>
   </div></section>
 
   <section id="char-based-problem" class="slide"><div>
@@ -265,7 +252,7 @@ Java is a serious language for serious business used by serious grown-ups
       <ul>
         <li>Jieba 是从 Python 移植过来的。有人写好 ES Analyzer</li>
         <li>架构简单，安装完就有不错的效果</li>
-        <li>完整教学可参考 <a href="https://speakerdeck.com/fukuball/jieba-jie-ba-zhong-wen-duan-ci">fukuball 的介绍</a>（我学的时候也是看他网志）</li>
+        <li>完整教学可参考 <a href="https://speakerdeck.com/fukuball/jieba-jie-ba-zhong-wen-duan-ci">fukuball 的介绍（繁）</a>（我学的时候也是看他网志）</li>
         <li>几个技术关键字：词典、词频、Trie 树、DAG、HMM</li>
         <li>概念很简单：看看这个词有没有在词典里，有的话就照着断；没有的话就用中文常见的拆词规律猜（跑出新的词）</li>
         <li>词典内置就有一个，效果也很好</li>
@@ -360,7 +347,7 @@ cut('侧背包 侧肩背包')     # 侧背包 / 侧肩 / 背包</code></pre>
   </div></section>
 
   <section id="jieba-index-mode" class="slide"><div>
-      <h2>Jieba search(index) mode</h2>
+      <h2>Jieba search(index in ES) mode</h2>
       <p class="tighter">解决上述复合词断词问题，能要求 jieba 把可能的断词组合都列出。</p>
       <pre class="language-python tighter"><code>cut_for_search('侧背包')     cut_for_search('帆布鞋')
 # 背包 / 侧背包              # 帆布 / 布鞋 / 帆布鞋</code></pre>
@@ -394,24 +381,9 @@ cut('侧背包 侧肩背包')     # 侧背包 / 侧肩 / 背包</code></pre>
       <ul>
         <li>仔细看 jieba 文档的话，它的词典是透过<a href="https://github.com/fxsjy/jieba/issues/7">几个简体语料库</a>结合新词探勘所做成，再使用简繁转换</li>
         <li>里面有一些「一万一千五百二十颗」、「一九九九年」、「黄蓉拾」、「黄蓉之」等无义词，增加计算负担</li>
-        <li>其中「帆布背包」、「水晶项链」这种就要小心会让搜索鬼打墙</li>
+        <li>其中「帆布背包」、「水晶项链」这种就要小心会让搜索失效</li>
         <li class="next">砍掉重练？等等，能重练的话那当初……（无限鸡生蛋 loop）</li>
       </ul>
-  </div></section>
-
-  <section id="coscup2013-moedict" class="slide cover h"><div>
-      <img src="pics/external/coscup2013_moedict.png" alt="">
-  </div></section>
-
-  <section id="coscup2013-moedict-quote" class="slide"><div>
-      <h2>萌典、g0v 中文断词</h2>
-      <figure>
-        <blockquote class="cjk">
-          <p>中文断词有很多经验算法……最直觉的做法，就是拿一个字典，比对最长相同的部份断词……我们手边刚好有一个很大的词典，萌典。<span class="author">唐凤，<a href="https://speakerdeck.com/audreyt/meng-dian-at-coscup-2013-chai-zheng-fu-yuan-di-zhong-jian">COSCUP 2013</a></span></p>
-        </blockquote>
-      </figure>
-      <p>2013 年，我坐在台下听</p>
-      <p>2015 年，我用到它了</p>
   </div></section>
 
   <section id="moedict-intro" class="slide"><div>
@@ -450,19 +422,6 @@ cut('侧背包 侧肩背包')     # 侧背包 / 侧肩 / 背包</code></pre>
     <img src="pics/external/moedict_example.png" alt="">
   </div></section>
 
-  <section id="moedict-example-json" class="slide"><div>
-    <pre class="language-json medium"><code># /a/狂狷.json
-{"h": [
-  {"d": [
-    {"q": ["`论语~．`子路~：「`子~`曰~：『`不得~`中行~`而~……』」",
-           "`抱朴子~．`外篇~．`逸民~：「`昔~`狂狷~`华~`士~，……」"],
-     "f":"`过于~`激进~`与~`过于~`保守~`的~`人~。"}],
-   "p": "kuáng juàn",
-   "b": "ㄎㄨㄤˊ ㄐㄩㄢˋ",
-   "=": "2654000071"}],
- "t": "`狂~`狷~"}</code></pre>
-  </div></section>
-
   <section id="jieba-moedict" class="slide"><div>
       <h2>让 jieba 使用萌典</h2>
       <ul>
@@ -475,58 +434,6 @@ cut('侧背包 侧肩背包')     # 侧背包 / 侧肩 / 背包</code></pre>
           <li>不够技术？之后再回来谈缺词</li>
         </ul>
         <li>其实光用这些，效果就很好了</li>
-      </ul>
-  </div></section>
-
-  <section id="handcraft-counter-tf" class="slide"><div>
-      <h2>单用词频断词就有不错的效果</h2>
-      <img src="pics/results/handcraft_counter_tf.png" alt="">
-    </div>
-    <style>
-      #handcraft-counter-tf img {
-        width: 100%;
-      }
-    </style>
-  </section>
-
-  <section id="increase-corpus" class="slide"><div>
-      <h2>增加文本量更新词频</h2>
-      <ul>
-        <li>萌典中的例句跟释义有固定的格式，词频应该从正常文本统计</li>
-        <li>中文维基百科大约有 24 万条目</li>
-        <ul>
-          <li>原始 XML 文本包含 mediawiki markup（图表等）</li>
-          <li>维基是世界各地的人共同编辑，各地方言、简繁交杂</li>
-          <li>借助 <a href="https://github.com/BYVoid/OpenCC">OpenCC</a> 对原始文本简繁转换及用语的统一</li>
-        </ul>
-        <li>结合站上产品说明、刊物已经有很足够的文本</li>
-        <li>加一加文本共约有 100M 个词，1M 个段落</li>
-      </ul>
-  </div></section>
-
-  <section id="wiki-entry-ex" class="slide cover w"><div>
-      <img src="pics/results/wikipedia_entry_example.png" alt="">
-  </div></section>
-
-  <section id="wiki-process-result" class="slide"><div>
-      <h2>维基百科处理</h2>
-      <ul>
-        <li>使用 gensim 内置的 <code>WikiCorpus</code></li>
-        <li>在 parsing 尚有进步空间</li>
-        <li>在不关闭 jieba 新词功能时，会增加约 3M 个新词</li>
-        <li>多数是人名、地名、数字等</li>
-        <li>扣除低词频 (&lt;5) 还有约 700K 新词</li>
-        <li>最后我们并没有把新词加回 jieba 中</li>
-      </ul>
-  </div></section>
-
-  <section id="jieba-summary" class="slide"><div>
-      <h2>Jieba 总结与补充</h2>
-      <ul>
-        <li>利用萌典、wiki 与自己的数据，词条数从 580K 降到 190K</li>
-        <li>Jieba 有提供平行处理断词，但我发现自己写 multiprocess、IPyParallel，把不同的 input 发给很多 jieba worker (embarassingly parallel)，能达到更不错的加速</li>
-        <li>Jieba cache 是根据 dictionary 路径去创建的，要小心 multiprocess 不要同时写入，可以先 initialize 其中一台</li>
-        <li>繁体 HMM model 需要跳坑完成</li>
       </ul>
   </div></section>
 
@@ -644,25 +551,6 @@ cut('侧背包 侧肩背包')     # 侧背包 / 侧肩 / 背包</code></pre>
     </div>
   </div></section>
 
-  <section id="word2vec-vector-diff" class="slide twocol-lr"><div>
-    <div class="left">
-    <p>还有一些很有趣的特性</p>
-    <p>\[
-    \begin{align*}
-      &m_{东京} - m_{日本} \\
-      \approx& m_{柏林} - m_{德国}
-    \end{align*}
-    \]</p>
-    <p>因为维基的叙述像「东京是日本的首都」、「柏林是德国的首都」</p>
-    </div>
-    <div class="right">
-      <div class="citation">
-        <img src="pics/external/word2vec_vecdiff.gif" alt="">
-        <p>Ref: <a href="http://google-opensource.blogspot.tw/2013/08/learning-meaning-behind-words.html">Google Open Source Blog</a></p>
-      </div>
-    </div>
-  </div></section>
-
   <section id="word2vec-wiki" class="slide twocol"><div>
     <h2 class="tighter">使用中文维基的 word2vec</h2>
     <div class="left">
@@ -720,109 +608,6 @@ cut('侧背包 侧肩背包')     # 侧背包 / 侧肩 / 背包</code></pre>
 茶园       	0.742
 手采       	0.741</code></pre>
     </div>
-  </div></section>
-
-  <section id="word2vec-wiki-examples" class="slide twocol"><div>
-      <div class="left">
-      <pre class="language-python medium"><code>m.most_similar(['白毫', '乌龙'])
-乌龙茶      	0.861
-金萱       	0.809
-冻顶       	0.804
-红茶       	0.788
-绿茶       	0.780
-阿里山       0.779
-蜜香       	0.763
-青心       	0.759
-甘润       	0.747
-东方美人茶    0.744</code></pre>
-      </div>
-      <div class="right">
-      <pre class="language-python medium"><code>m.most_similar(['蓝色'])
-绿色       	0.870
-紫色       	0.862
-黄色       	0.851
-粉色       	0.827
-红色       	0.814
-桃红色      	0.798
-橘色       	0.794
-蓝        	0.785
-白色       	0.767
-浅        	0.766</code></pre>
-      </div>
-  </div></section>
-
-  <section id="word2vec-wiki-examples-otaku" class="slide twocol"><div>
-      <div class="left">
-      <pre class="language-python medium"><code>m.most_similar(['凉宫', '春日'])
-朝比奈实     	0.660
-小凉宫      	0.653
-有希       	0.635
-虚妹       	0.630
-nyoron   	0.593
-阿虚       	0.592
-小鹤屋      	0.583
-喜绿江      	0.574
-屋学       	0.564
-实玖瑠的     	0.559</code></pre>
-      </div>
-      <div class="right">
-      <pre class="language-python medium"><code>m.most_similar(['玲音'])
-狼雨       	0.564
-texhnolyze	0.561
-flcl     	0.558
-clamp    	0.542
-沙罗鬼      	0.539
-宝魔       	0.535
-亡念       	0.534
-碧奇魂      	0.527
-chobits  	0.526
-虫师       	0.526</code></pre>
-      </div>
-      <div class="sidenote grey"><p>FYI: <a href="http://knowyourmeme.com/memes/nyoron">nyoron</a>、<a href="https://en.wikipedia.org/wiki/Texhnolyze">texhnolyze</a><br>wiki 很宅der</p></div>
-    </div>
-    <style>
-      #word2vec-wiki-examples-otaku .sidenote p {
-        margin-bottom: 5px;
-        line-height: 1.5em;
-        text-align: right;
-      }
-      #word2vec-wiki-examples-otaku .sidenote {
-        position: absolute;
-        width: 300px;
-        right: 120px;
-        bottom: 25px;
-        line-height: 1.5em;
-        font-size: 20px;
-        padding: 0 10px;
-      }
-    </style>
-  </section>
-
-  <section id="word2vec-wiki-examples-country" class="slide twocol"><div>
-      <div class="left">
-      <p>在论文上看得到的比较</p>
-      <pre class="language-python medium"><code>纽约 - 美国 = ? - 英国
-伦敦       	0.837
-逛        	0.817
-一线       	0.816
-
-北京 - 中国 = ? - 德国
-柏林       	0.792
-荣获       	0.762
-旅德       	0.746</code></pre>
-      </div>
-      <div class="right">
-      <p>WTF 系列</p>
-      <pre class="language-python medium"><code>宅男 - 男生 = ? - 女生
-正妹       	0.836
-宅女       	0.829
-宅男女神     	0.823
-
-腐女 - 女生 = ? - 男生
-御宅族      	0.779
-傲娇       	0.750
-yaoi     	0.749</code></pre>
-      </div>
   </div></section>
 
   <section id="prod-semantic-search" class="slide twocol"><div>
@@ -886,17 +671,6 @@ yaoi     	0.749</code></pre>
       </ul>
   </div></section>
 
-  <section id="not-the-best-way" class="slide"><div>
-      <h2>今天用的未必是最好的方法</h2>
-      <p>「咦你刚刚说用△△△，但那不是………为什么不用○○○效果更好」</p>
-      <ul>
-        <li>因为△△△能动，而且效果能接受，就没继续做下去了</li>
-        <li>简单的方法能动就用简单的</li>
-        <li>用两成的工完成六成的效果</li>
-        <li>也不要一开始就想到 big data、deep learning</li>
-      </ul>
-  </div></section>
-
   <section id="pinkoi-whats-next" class="slide"><div>
       <h2>What's next for <img class="logo" src="pics/pinkoi.png" alt="Pinkoi"> ?</h2>
       <ul>
@@ -956,6 +730,54 @@ yaoi     	0.749</code></pre>
   </style>
   </section>
 
+  <section id="taiwan-python-community-cover" class="slide cover w subheader mid2"><div>
+      <h2>台湾 Py 社群近况</h2>
+      <img src="pics/mid2.jpg" alt="">
+    </div>
+  </section>
+
+  <section id="tawian-py-community" class="slide twocol-lr"><div>
+    <h2>北中南东西各地 Python 社群</h2>
+    <div class="left">
+      <p>欢迎大家，环岛兼参加各地聚会！</p>
+      <p>去年新成立了<br><a href="https://djangogirls.org/taipei/">Django Girls Taipei</a></p>
+      <p>（制图：Mimi Xu）</p>
+    </div>
+    <div class="right">
+      <div class="citation">
+        <img src="pics/taiwan_py_community.png" alt="">
+      </div>
+    </div>
+  </div></section>
+
+  <section id="django-girls-taipei" class="slide twocol"><div>
+      <div class="left">
+        <img src="pics/djangogirls/logo.png" alt="">
+        <ul>
+          <li>约一个月聚会一次</li>
+          <li>除了带新手，也再培养未来讲师</li>
+          <li>定期与 Py web 聚会合办</li>
+          <li>（资料由主办人 Michelle 提供）</li>
+        </ul>
+      </div>
+      <div class="right">
+        <img src="pics/djangogirls/IMG_8763.JPG" alt="">
+        <img src="pics/djangogirls/IMG_8448.JPG" alt="">
+      </div>
+    </div>
+    <style>
+      #django-girls-taipei .left img {
+        width: 100%;
+      }
+      #django-girls-taipei .right img {
+        width: 100%;
+      }
+    </style>
+  </section>
+
+  <section id="pycontw-2016" class="slide cover h"><div>
+      <img src="pics/pycontw2016.jpg" alt="">
+  </div></section>
 
   <!-- End Slide -->
   <section id='end' class='slide cover shout w'><div>
