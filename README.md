@@ -2,17 +2,22 @@
 
 Keyword: ElasticSearch, jieba, gensim, word2vec
 
-- 2015.09.12 PyCon China 2015
+- 2015.09.12-13 PyCon China 2015
     > The talk length (25min) somehow limits its extent.
-    > On top of that part of the talk is about updates of Taiwan Python communities.
-    > The shorten slides can be found at [TBD].
+    > On top of that, part of the talk is about updates of Taiwan Python communities. So many details are skipped.
+
+    - Shorten slides: [Shanghai][pyconcn-shanghai] and [Guangzhou][pyconcn-guangzhou]
+      though they're almost the same
+    - Youtube screencast: [Shanghai][yt-shanghai]
 
 - 2015.09.14 MLDM Monday Meetup
     - [Meetup link][mldm-monday]
     - Youtube screencast (TBD)
 
 [mldm-monday]: http://www.meetup.com/Taiwan-R/events/224918468/
-
+[pyconcn-shanghai]: http://blog.liang2.tw/2015Talk-Chinese-Search/pycon_cn_shanghai.html
+[pyconcn-guangzhou]: http://blog.liang2.tw/2015Talk-Chinese-Search/pycon_cn_guangzhou.html
+[yt-shanghai]: https://www.youtube.com/watch?v=KCeqTaJC0U8
 
 ## License
 
