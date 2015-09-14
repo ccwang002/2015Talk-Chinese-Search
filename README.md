@@ -12,12 +12,14 @@ Keyword: ElasticSearch, jieba, gensim, word2vec
 
 - 2015.09.14 MLDM Monday Meetup
     - [Meetup link][mldm-monday]
-    - Youtube screencast (TBD)
+    - Youtube screencast: [MLDM Monday][yt-mldm]
 
 [mldm-monday]: http://www.meetup.com/Taiwan-R/events/224918468/
 [pyconcn-shanghai]: http://blog.liang2.tw/2015Talk-Chinese-Search/pycon_cn_shanghai.html
 [pyconcn-guangzhou]: http://blog.liang2.tw/2015Talk-Chinese-Search/pycon_cn_guangzhou.html
 [yt-shanghai]: https://www.youtube.com/watch?v=KCeqTaJC0U8
+[yt-mldm]: https://www.youtube.com/watch?v=9HvRP6VpXlU
+
 
 ## License
 
