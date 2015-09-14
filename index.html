@@ -987,6 +987,47 @@ yaoi     	0.749</code></pre>
     </style>
   </section>
 
+  <section id="misc-cover" class="slide cover w subheader mid"><div>
+      <h2>Misc. Topics</h2>
+      <img src="pics/mid.jpg" alt="">
+    </div>
+  </section>
+
+  <section class="slide twocol-lr"><div>
+      <div class="left">
+        <h2>高記憶體<br>用量調整</h2>
+        <ul>
+          <li>gensim 拿 w2v 機制</li>
+          <li>加上自己的 model 可能就需要占用 4GB 以上記憶體</li>
+          <li>load 4GB 記憶也讓 service 啟動時間變長</li>
+        </ul>
+      </div>
+      <div class="right">
+        <div class="citation">
+        <img src="pics/results/word2vec_mem-01.png" alt="">
+        </div>
+      </div>
+  </div></section>
+
+  <section class="slide twocol-lr"><div>
+      <div class="left">
+        <h2>Disk caching</h2>
+        <ul>
+          <li>用 database？還沒試</li>
+          <li>有個 library 叫 <a href="https://www.hdfgroup.org/HDF5/">HDF5</a></li>
+          <li>不是 HDFS</li>
+          <li>大型矩陣存取</li>
+          <li>實測效能沒問題</li>
+          <li>省了近 2GB RAM</li>
+        </ul>
+      </div>
+      <div class="right">
+        <div class="citation">
+        <img src="pics/results/word2vec_mem-02.png" alt="">
+        </div>
+      </div>
+  </div></section>
+
   <section id="my-future-goal" class="slide"><div>
       <blockquote class="place c cjk" lang="en"><p lang="zh" dir="ltr">以前 COSCUP 結束後，會眾紛紛撰寫網誌，紀錄一年一度的盛會，現在參與人數這麼多，實際紀錄的人卻更少，而且鮮少是著墨議題本身，反過來說，日本朋友紀錄的內容還比台灣會眾清楚 (?)</p>&mdash; Jim Huang (@jserv) <a href="https://twitter.com/jserv/status/634150416171687936">August 19, 2015</a></blockquote>
   </div></section>
