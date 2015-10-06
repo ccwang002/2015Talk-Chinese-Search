@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chinese Search</title>
+  <meta name="viewport" content="width=792, user-scalable=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <!-- Icon -->
+  <link href="pics/favicon.png" rel="icon" type="image/x-icon" />
+  <!-- MathJax -->
+  <!-- CSS Stle -->
+  <link rel="stylesheet" href="lib/shower/themes/ribbon/styles/screen.css">
+  <link rel="stylesheet" href="lib/highlight/styles/tomorrow.css" type="text/css"/>
+  <link rel="stylesheet" href="static/custom.css" type="text/css"/>
+</head>
+<body class="list">
+  <!-- Header in overview -->
+  <header class="caption">
+    <h1>Chinese Search Sharing</h1>
+    <p style="line-height: 32px; padding-top:15px;"><a href="http://liang2.tw">Liang Bo Wang (亮亮)</a>, 2015-10-06</p>
+  </header>
+  <!-- Cover slide -->
+  <section id="cover" class="slide cover w"><div>
+    <h3 id="talk-subheader">Taipei.py Web, 2015-10-16</h3>
+    <h2 id="talk-header" class="place">中文搜尋經驗分享</h2>
+    <p id="talk-author">
+      By <a href="http://liang2.tw" target="_blank">Liang<sup>2</sup></a> under CC 4.0 BY license
+    </p>
+    <p id="usage-instr">
+      <kbd>Esc</kbd> to overview <br />
+      <kbd>←</kbd> <kbd>→</kbd> to navigate
+    </p>
+    <img src="pics/cover.jpg" alt="">
+  </div>
+  <style>
+    #talk-header {
+      color: #EEE;
+      text-shadow: 0px 0px 5px black;
+      text-align: center;
+      font-size: 110px;
+      line-height: 1.2em;
+      opacity: 1;
+      position: relative;
+      top: 60px;
+      width: 120%;
+    }
+    #talk-subheader {
+      color: #E9FFDA;
+      text-shadow: 0px 0px 2px black;
+      text-align: center;
+      font-size: 36px;
+      opacity: 1;
+      position: relative;
+      top: -20px;
+    }
+    #talk-author {
+      position: relative;
+      line-height: 1.2em;
+      text-shadow: 1px 1px 3px #000;
+    }
+    #talk-author {
+      top: 0px;
+    }
+    #talk-author a {
+      color: #FFFA20;
+    }
+    #cover p {
+      margin: 10px 0 0;
+      text-align: center;
+      color: #FFF;
+      font-size: 32px;
+      opacity: 1;
+    }
+    #usage-instr {
+      position: absolute;
+      text-align: right;
+      right: 30px;
+      bottom: 20px;
+    }
+    #usage-instr kbd {
+      opacity: 0.8;
+      color: #784639;
+      background-color: white;
+    }
+    #cover .src-link {
+      position: absolute;
+      font-size: 14px;
+      text-align: right;
+      bottom: 10px;
+      right: 10px;
+    }
+    #cover img {
+      opacity: 0.85;
+    }
+  </style>
+  </section>
+
+  <section id="about-me" class="slide"><div>
+      <h2>關於我</h2>
+      <ul>
+        <li>會說一些 R 和 Python</li>
+        <li>PyCon TW 2016 議程組：誠徵<strong class="pinkoi">志工</strong>！！</li>
+        <li>NTU Bioinfo master student<br>歡迎找我聊我的研究題目</li>
+        <li>Former intern at Microsoft Research Asia</li>
+        <li>Former Intern at <strong><a href="http://www.pinkoi.com/about" class="pinkoi">Pinkoi</a></strong></li>
+        <li>此人偏宅，但今天不一定有宅梗</li>
+      </ul>
+      <img id="protrait" src="pics/me.jpg" class="place r"alt="">
+    </div>
+    <style>
+      #protrait {
+        margin-right: 120px;
+        width: 300px;
+      }
+      #about-me ul {
+        width: 60%;
+      }
+    </style>
+  </section>
+
+  <section id="background" class="slide"><div>
+      <h2>背景介紹</h2>
+      <ul>
+        <li><img class="logo" src="pics/pinkoi.png" alt="Pinkoi"> 用 ElasticSearch (ES) 做站上商品的搜尋</li>
+        <li>多數亞洲文字（中、日、泰）都需要額外斷詞處理</li>
+        <li>內建有一個 ICU（International Components for Unicode）Analyzer，<br>基本能動但效果有限（參考 <a href="http://userguide.icu-project.org/boundaryanalysis">ICU - Text Boundary Analysis</a>）</li>
+        <li>ES 改版之快，估計會被海放到 2.0……反正它海放了一堆第三方套件，所以想升也沒辦法</li>
+        <li>關於 ES Analyzer 的使用可以參考<a href="https://www.elastic.co/blog/found-text-analysis-part-1">官網教學</a></li>
+      </ul>
+  </div>
+    <style>
+      #background .logo {
+        width: 1.5em;
+        height: 1.5em;
+        vertical-align: bottom;
+        padding-bottom: 0.25em;
+      }
+    </style>
+  </section>
+
+  <section id="ideal-search" class="slide"><div>
+    <h2>搜尋的基本要求</h2>
+    <ul>
+      <li>搜尋「○○」，則所有跟○○有關的東西都要找到</li>
+      <li>在「○○」的結果中，不要出現不相關的ｘｘ</li>
+      <li>寧可有些ｘｘ也不要○○都找不到</li>
+    </ul>
+    <p>找「蘋果派」的時候最前面的搜尋結果應該都是蘋果派，應該不會有香蕉船，也希望沒有蘋果塔，但寧可有些蘋果塔也不要連蘋果派都找不到</p>
+  </div></section>
+
+  <section id="es-basics-cover" class="slide cover w subheader mid"><div>
+      <h2>ES Search Basics</h2>
+      <img src="pics/mid.jpg" alt="">
+    </div>
+  </section>
+
+  <section id="term-definition" class="slide"><div>
+      <h2>ES 搜尋的最小單位是 Term (Token)</h2>
+      <figure>
+        <blockquote>
+          <p>Who controls the past controls the future. Who controls the present controls the past. <span class="author">&mdash; 1984, George Orwell</span></p>
+        </blockquote>
+      </figure>
+      <p class="tighter">會被 ES Tokenizer 轉換成 Who / controls / the / past / controls / the / future / Who / controls / the / present / controls / the / past。<br>
+        實務上會在 tokenizer 前後加上 filter 小寫轉換、去除無意義的 a、the。</p>
+      <p class="tighter">這裡 term 有：controls(4), the(4), Who(2), past(2), future(1), present(1)</p>
+    </div>
+  </section>
+
+  <section id="es-custom-analyzer" class="slide"><div>
+    <div class="citation">
+      <img src="pics/external/es_custom_analyzer.png" alt="">
+      <p>Ref: <a href="https://www.elastic.co/blog/found-text-analysis-part-1">All About Analyzers, Part One, ES official blog</a></p>
+    </div>
+  </div>
+    <style>
+    #es-custom-analyzer .citation img {
+      width: auto;
+      height: 600px;
+    }
+    #es-custom-analyzer .citation {
+      position: absolute;
+      top: 5px;
+      left: 250px;
+    }
+    </style>
+  </section>
+
+  <section id="how-es-search" class="slide"><div>
+      <h2>ES (Lucene) 是怎麼搜尋的？</h2>
+      <p>零魔法，最核心的概念是 <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">TF-IDF</a>。可以<a href="https://github.com/ccwang002/2015Talk-Chinese-Search/blob/master/code/tf_idf.py">自己做一個</a>。</p>
+      <ul>
+        <li><strong>Term Frequency (TF)</strong>：在 document 中出現的次數多寡</li>
+        <li><strong>Inverse Document Frequency (IDF)</strong>：這 term 總共在多少 document 中出現，出現太頻繁的（we, you）的權重較低</li>
+        <li><strong>Field length</strong>：document 越短，有找到表示越相關</li>
+      </ul>
+      <p>上三個會生成相似度 similarity，最後結合其他自定的指標變成 score</p>
+  </div></section>
+
+  <section id="tf-idf-in-action" class="slide"><div>
+      <pre class="language-python"><code># python3 tf_idf.py 後背包
+Searching 後背包 in 7 documents ...
+['復古單寧帆布後雙背包',  '米色帆布橫式側背包',
+ '藍色石紋斜背包',       '帆布眼鏡盒',
+ '鱷魚來了帆布筆袋',     '拼木紋布質文庫書衣',
+ '單眼相機用亮彩防水包布']
+Top 3 similar documents are:
+d1: 復古單寧帆布後雙背包 [sim=0.4969]
+d3: 藍色石紋斜背包 [sim=0.3262]
+d2: 米色帆布橫式側背包 [sim=0.3017]</code></pre>
+  </div></section>
+
+  <section id="tf-idf-inner" class="slide"><div>
+      <h2>Under the hood - cos similarity</h2>
+      <pre class="language-python small"><code>q  = {後: 1.00, 背: 1.00, 包: 1.00}
+
+d1 = {復: 2.25, 古: 2.25, 單: 1.85, <mark>寧: 2.25</mark>, 帆: 1.34, <mark>布: 1.00</mark>,
+      後: 2.25, 雙: 2.25, 背: 1.56, 包: 1.34}
+d2 = {米: 2.25, 色: 1.85, 帆: 1.34, 布: 1.00, 橫: 2.25, 式: 2.25,
+      側: 2.25, 背: 1.56, 包: 1.34}
+d3 = {藍: 2.25, 色: 1.85, 石: 2.25, 紋: 1.85, 斜: 2.25, 背: 1.56, 包: 1.34}
+d4 = {帆: 1.34, 布: 1.00, 眼: 1.85, 鏡: 2.25, 盒: 2.25}
+d5 = {鱷: 2.25, 魚: 2.25, 帆: 1.34, 布: 1.00, 筆: 2.25, 袋: 2.25}
+d6 = {拼: 2.25, 木: 2.25, 紋: 1.85, 布: 1.00, 質: 2.25, 文: 2.25, 庫: 2.25,
+      書: 2.25, 衣: 2.25}
+d7 = {單: 1.85, 眼: 1.85, 相: 2.25, 機: 2.25, 用: 2.25, 亮: 2.25, 彩: 2.25,
+      防: 2.25, 水: 2.25, 包: 1.34, 布: 1.00}</code></pre>
+  </div></section>
+
+  <section id="char-based-problem" class="slide"><div>
+      <h2>問題是一字字斷詞破壞中文詞意</h2>
+      <pre class="language-python tighter"><code>Searching 包布 in 7 documents ...
+
+Top 3 similar documents are:
+d2: 米色帆<mark>布</mark>橫式側背<mark>包</mark> [sim=0.2981]
+d1: 復古單寧帆<mark>布</mark>後雙背<mark>包</mark> [sim=0.2762]
+d7: 單眼相機用亮彩防水<mark>包布</mark> [sim=0.2459]</code></pre>
+      <p><span class="pinkoi">包布 ≠ 布包 ≠ 布○○包。</span>我們需要更好的分詞模式。</p>
+  </div></section>
+
+<!--
+過去很近，近的就在眼前，以致於你一集中焦距就看出了它的遠。
+師傅，我已經變成瞎眼了。從今以後一輩子都看不見您的臉了，在她面前叩頭說道。
+穿過縣界長長的隧道，便是雪國。夜空下一片白茫茫。火車在信號所前停了下來。
+原來明治時代的木頭裡根本就沒有埋藏仁王。同時，也明白了為何運慶至今仍健在的理由。
+Java is a serious language for serious business used by serious grown-ups
+-->
+
+  <section id="cht-term-redefine" class="slide"><div>
+      <h2>中文的斷詞應該像這樣</h2>
+      <figure>
+        <blockquote class="cjk">
+          <p>過去很近，近的就在眼前，以致於你一集中焦距就看出了它的遠。<br><span class="author">&mdash; 張惠菁。《你不相信的事》</span></p>
+        </blockquote>
+      </figure>
+      <ul>
+        <li>過去 / 很 / 近 / 近 / 的 / 就 / 在 / 眼前 / 以致於 / 你 / 一 / 集中 / 焦距 / 就 / 看出 / 了 / 它 / 的 / 遠</li>
+        <li>米色 / 帆布 / 橫式 / 側背包</li>
+        <li>很顯然地這不是簡單的切割</li>
+        <li>在 ES 就可以靠設計 Tokenizer(Analyzer) 來完成複雜的斷詞</li>
+      </ul>
+  </div></section>
+
+  <section id="jieba-cover" class="slide cover w subheader mid"><div>
+      <h2>Jieba <br>中文<br>斷詞</h2>
+      <img src="pics/mid.jpg" alt="">
+    </div>
+  </section>
+
+  <section id="jieba-intro" class="slide"><div>
+      <h2>中文斷詞我們選擇 jieba</h2>
+      <ul>
+        <li>Jieba 是從 Python 移植過來的。有人寫好 ES Analyzer</li>
+        <li>架構簡單，安裝完就有不錯的效果</li>
+        <li>完整教學可參考 <a href="https://speakerdeck.com/fukuball/jieba-jie-ba-zhong-wen-duan-ci">fukuball 的介紹</a>（我學的時候也是看他網誌）</li>
+        <li>幾個技術關鍵字：詞典、詞頻、Trie 樹、DAG、HMM</li>
+        <li>概念很簡單：看看這個詞有沒有在詞典裡，有的話就照著斷；沒有的話就用中文常見的拆詞規律猜（跑出新的詞）</li>
+        <li>詞典內建就有一個，效果也很好</li>
+      </ul>
+  </div></section>
+
+  <section id="jieba-example" class="slide"><div>
+      <h2 class="tighter">Jieba in action</h2>
+      <pre class="language-python"><code>'/'.join(jieba.cut(
+      '過去很近，近的就在眼前，'
+      '以致於你一集中焦距就看出了它的遠。'))
+# 過去/很近/，/近/的/就/在/眼前/，/
+# 以致於/你/一/集中/焦距/就/看出/了/它/的/遠/。
+
+'/'.join(jieba.cut('穿過縣界長長的隧道，便是雪國。'))
+# 穿過/縣界/長長的/隧道/，/便是/雪國/。
+</code></pre>
+  </div></section>
+
+  <section id="jieba-example-hmm" class="slide"><div>
+      <h2>Jieba HMM in action</h2>
+      <pre class="language-python"><code>'/'.join(jieba.cut('便是雪國', HMM=True))
+# 便是/<mark>雪國</mark>
+'/'.join(jieba.cut('便是雪國', HMM=False))
+# 便是/<mark>雪/國</mark></code></pre>
+  <p>在中文，二字二字成詞比後者的組合機會高得多<br>（極端的例子：「科科科科科」也會被拆成「科科/科科科」</p>
+  </div></section>
+
+  <section id="jieba-pitfall" class="slide"><div>
+       <figure>
+        <blockquote>
+          <p>Some people, when confronted with a Chinese segmentation porblem, think "I know, I'll use a dictionary look-up." Now they have two problems.<span class="author">(An super old <a href="http://regex.info/blog/2006-09-15/247">meme</a>)</span></p>
+        </blockquote>
+      </figure>
+      <pre class="language-python tighter"><code>cut('相機包布')           # 相機包 / 布
+cut('台中太陽餅')         # 台 / 中 / 太陽 / 餅
+cut('側背包 側肩背包')     # 側背包 / 側肩 / 背包</code></pre>
+      <ul>
+        <li>詞除了要夠齊全（台中、太陽餅）</li>
+        <li>詞頻也要符合文本的分佈（相機、包布）</li>
+        <li class="next pinkoi">啊第三個是錯在哪裡啦（翻桌！）</li>
+      </ul>
+      <div class="sidenote grey">
+        <p>實際上 jieba 內建的字典並沒有這個問題，但我覺得這個例子比較簡單</p>
+      </div>
+    </div>
+    <style>
+      #jieba-pitfall .sidenote p {
+        margin-bottom: 5px;
+        line-height: 1.5em;
+      }
+      #jieba-pitfall .sidenote {
+        position: absolute;
+        width: 320px;
+        right: 80px;
+        bottom: 75px;
+        line-height: 1.5em;
+        font-size: 20px;
+        padding: 0 10px;
+        border: dotted 1px grey;
+      }
+    </style>
+  </section>
+
+  <section id="cht-seg-pitfall" class="slide twocol"><div>
+      <h2>側背包≠ 側肩 + 背包？！</h2>
+      <div class="left">
+        <ul class="tighter">
+          <li>使用者查<span class="pinkoi">「側背包」</span></li>
+          <li>產品裡有個「側肩 / 背包」</li>
+          <li>ES 的行為：</li>
+          <ol>
+            <li>側背包 in 側肩？否</li>
+            <li>側背包 in 背包？否</li>
+            <li>回傳找不到相關商品</li>
+          </ol>
+        </ul>
+      </div>
+      <div class="right">
+        <ul class="tighter">
+          <li>使用者查<span class="pinkoi">「側 / 背包」</span></li>
+          <li>產品裡有個「側肩 / 背包」</li>
+          <li>ES 的行為：</li>
+          <ol>
+            <li>側 in 側肩？是</li>
+            <li>背包 in 背包？是</li>
+            <li>回傳找到相關商品</li>
+          </ol>
+        </ul>
+      </div>
+      <p>斷詞不是切越長越好！查不到比查不準還慘……有沒有改進方法？</p>
+  </div></section>
+
+  <section id="jieba-index-mode" class="slide"><div>
+      <h2>Jieba search(index) mode</h2>
+      <p class="tighter">解決上述複合詞斷詞問題，能要求 jieba 把可能的斷詞組合都列出。</p>
+      <pre class="language-python tighter"><code>cut_for_search('側背包')     cut_for_search('帆布鞋')
+# 背包 / 側背包              # 帆布 / 布鞋 / 帆布鞋</code></pre>
+      <p>但並不能完全解決問題，有時候會缺字<sup>註</sup>，在這裡就少了個「側」詞。使用者能查到背包但缺乏「側」的訊息。<br>
+      另外詞變多了，會增加搜尋的負擔。</p>
+      <div class="sidenote grey">
+        <p>註：推估原因是 jieba 內建的 HMM 沒有繁體字 ，所以 \(P(\text{側}|B) = 0\) 新詞</p>
+      </div>
+    </div>
+    </div>
+    <style>
+      #jieba-index-mode .sidenote p {
+        margin-bottom: 5px;
+        line-height: 1.5em;
+      }
+      #jieba-index-mode .sidenote {
+        position: absolute;
+        width: 230px;
+        right: 130px;
+        bottom: 65px;
+        line-height: 1.5em;
+        font-size: 20px;
+        padding: 0 10px;
+        border: dotted 1px grey;
+      }
+    </style>
+  </section>
+
+  <section id="seg-dict-importance" class="slide"><div>
+      <h2>斷詞詞典與詞頻要小心</h2>
+      <ul>
+        <li>仔細看 jieba 文件的話，它的詞典是透過<a href="https://github.com/fxsjy/jieba/issues/7">幾個簡體語料庫</a>結合新詞探勘所做成，再使用簡繁轉換</li>
+        <li>裡面有一些「一万一千五百二十颗」、「一九九九年」、「黄蓉拾」、「黄蓉之」等無義詞，增加計算負擔</li>
+        <li>其中「帆布背包」、「水晶項鍊」這種就要小心會讓搜尋鬼打牆</li>
+        <li class="next">砍掉重練？等等，能重練的話那當初……（無限雞生蛋 loop）</li>
+      </ul>
+  </div></section>
+
+  <section id="coscup2013-moedict" class="slide cover h"><div>
+      <img src="pics/external/coscup2013_moedict.png" alt="">
+  </div></section>
+
+  <section id="coscup2013-moedict-quote" class="slide"><div>
+      <h2>萌典、g0v 中文斷詞</h2>
+      <figure>
+        <blockquote class="cjk">
+          <p>中文斷詞有很多經驗算法……最直覺的做法，就是拿一個字典，比對最長相同的部份斷詞……我們手邊剛好有一個很大的詞典，萌典。<span class="author">唐鳳，<a href="https://speakerdeck.com/audreyt/meng-dian-at-coscup-2013-chai-zheng-fu-yuan-di-zhong-jian">COSCUP 2013</a></span></p>
+        </blockquote>
+      </figure>
+      <p>2013 年，我坐在台下聽</p>
+      <p>2015 年，我用到它了</p>
+  </div></section>
+
+  <section id="moedict-intro" class="slide"><div>
+      <h2>萌典</h2>
+      <ul>
+        <li><span class="pinkoi">國語辭典</span>，來源為教育部《<a href="http://dict.revised.moe.edu.tw/">重編國語辭典修訂本</a>》</li>
+        <ul>
+          <li>16 萬筆條目</li>
+          <li>CC BY-ND 3.0 臺灣授權</li>
+          <li>不過辭典編輯完成於 1998 年，裡面沒有「手機」這種詞條</li>
+        </ul>
+        <li><span class="pinkoi">兩岸詞典</span>，來源為<a href="http://www.gacc.org.tw/art_base/">中華文化總會</a></li>
+        <ul>
+          <li>8 萬多筆條目，收錄了「手機」、「宅男」等詞條</li>
+          <li>不過是採用 CC BY-NC-ND 3.0 臺灣授權</li>
+          <li>適合研究使用（商業能使用嗎？）</li>
+        </ul>
+      </ul>
+      <div id="moedict-logo" class="citation">
+        <img src="pics/external/moedict_logo.png" alt="">
+        <p>Ref: <a href="https://twitter.com/moedict">moedict</a></p>
+      </div>
+  </div>
+  <style>
+    #moedict-logo {
+      position: absolute;
+      top: 110px;
+      right: 110px;
+      width: 230px;
+      height: auto;
+    }
+  </style>
+  </section>
+
+  <section id="moedict-example" class="slide cover w"><div>
+    <img src="pics/external/moedict_example.png" alt="">
+  </div></section>
+
+  <section id="moedict-example-json" class="slide"><div>
+    <pre class="language-json medium"><code># /a/狂狷.json
+{"h": [
+  {"d": [
+    {"q": ["`論語~．`子路~：「`子~`曰~：『`不得~`中行~`而~……』」",
+           "`抱朴子~．`外篇~．`逸民~：「`昔~`狂狷~`華~`士~，……」"],
+     "f":"`過於~`激進~`與~`過於~`保守~`的~`人~。"}],
+   "p": "kuáng juàn",
+   "b": "ㄎㄨㄤˊ ㄐㄩㄢˋ",
+   "=": "2654000071"}],
+ "t": "`狂~`狷~"}</code></pre>
+  </div></section>
+
+  <section id="jieba-moedict" class="slide"><div>
+      <h2>讓 jieba 使用萌典</h2>
+      <ul>
+        <li>jieba 詞典引入萌典的詞條，用說明、例句建立詞頻</li>
+        <li>OpenCC 做繁簡轉換</li>
+        <li>缺詞？「手機」、「潮t」、「手作」、「客製」</li>
+        <ul>
+          <li>其他資料來源，例：搜尋記錄</li>
+          <li>最後仍然可以 fallback 回手動加詞</li>
+          <li>不夠技術？之後再回來談缺詞</li>
+        </ul>
+        <li>其實光用這些，效果就很好了</li>
+      </ul>
+  </div></section>
+
+  <section id="handcraft-counter-tf" class="slide"><div>
+      <h2>單用詞頻斷詞就有不錯的效果</h2>
+      <img src="pics/results/handcraft_counter_tf.png" alt="">
+    </div>
+    <style>
+      #handcraft-counter-tf img {
+        width: 100%;
+      }
+    </style>
+  </section>
+
+  <section id="increase-corpus" class="slide"><div>
+      <h2>增加文本量更新詞頻</h2>
+      <ul>
+        <li>萌典中的例句跟釋義有固定的格式，詞頻應該從正常文本統計</li>
+        <li>中文維基百科大約有 24 萬條目</li>
+        <ul>
+          <li>原始 XML 文本包含 mediawiki markup（圖表等）</li>
+          <li>維基是世界各地的人共同編輯，各地方言、簡繁交雜</li>
+          <li>借助 <a href="https://github.com/BYVoid/OpenCC">OpenCC</a> 對原始文本簡繁轉換及用語的統一</li>
+        </ul>
+        <li>結合站上產品說明、刊物已經有很足夠的文本</li>
+        <li>加一加文本共約有 100M 個詞，1M 個段落</li>
+      </ul>
+  </div></section>
+
+  <section id="wiki-entry-ex" class="slide cover w"><div>
+      <img src="pics/results/wikipedia_entry_example.png" alt="">
+  </div></section>
+
+  <section id="wiki-process-result" class="slide"><div>
+      <h2>維基百科處理</h2>
+      <ul>
+        <li>使用 gensim 內建的 <code>WikiCorpus</code></li>
+        <li>在 parsing 有很大的進步空間（跳坑！）</li>
+        <li>在不關閉 jieba 新詞功能時，會增加約 3M 個新詞</li>
+        <li>多數是人名、地名、數字等</li>
+        <li>扣除低詞頻 (&lt;5) 還有約 700K 新詞</li>
+        <li>最後我們並沒有把新詞加回 jieba 中</li>
+      </ul>
+  </div></section>
+
+  <section id="jieba-summary" class="slide"><div>
+      <h2>Jieba 總結與補充</h2>
+      <ul>
+        <li>利用萌典、wiki 與自己的資料，詞條數從 580K 降到 190K</li>
+        <li>Jieba 有提供平行處理斷詞，但我發現自己寫 multiprocess、IPyParallel，把不同的 input 發給很多 jieba worker (embarassingly parallel)，能達到更不錯的加速</li>
+        <li>Jieba cache 是根據 dictionary 路徑去建立的，要小心 multiprocess 不要同時寫入，可以先 initialize 其中一台</li>
+        <li>繁體 HMM model 需要跳坑完成</li>
+      </ul>
+  </div></section>
+
+  <section id="search-summary" class="slide"><div>
+      <h2>ES Search 總結</h2>
+      <ul>
+        <li>ES 讓全文搜尋變得非常快速，但理論本身並沒有 magic</li>
+        <li>多樣的 analyzer、filter、aggregation，很容易整合搜尋到自己的服務</li>
+        <li>斷詞的必要性與取捨，應該以 max retreival 為優先</li>
+        <li>斷詞斷得太多，不代表資料就找不到。<span class="pinkoi">斷得太少才會</span></li>
+        <li>複合詞可考慮使用 index 模式列出所有斷詞組合</li>
+        <li>Jieba analyzer <span class="pinkoi">沒有寫 Tokenizer 無法擴充</span>（ik 也無法，smartcn 可）<br>
+        大家快跳坑！</li>
+      </ul>
+  </div></section>
+
+<!-- Future work:
+  - 寫一個 wiki parser，考慮到 wiki 詞條、連結等斷詞 hint
+  - 把 wiki 詞條加到 jieba 詞典裡
+  - open source
+  -->
+
+  <section id="semantic-search-cover" class="slide cover w subheader mid2"><div>
+      <h2>Semantic Search</h2>
+      <img src="pics/mid2.jpg" alt="">
+    </div>
+  </section>
+
+  <section id="search-chat" class="slide"><div>
+      <h2>仍有一成的搜尋找不（太）到結果</h2>
+      <ol>
+        <li>其實找到使用者想找的東西了</li>
+        <li>使用者想找的是同義的商品，但用詞不同</li>
+        <li>下太多關鍵字，站上就沒有這樣的商品</li>
+      </ol>
+      <p>也許沒有完全一樣的，但也許<span class="pinkoi">很像的</span></p>
+  </div></section>
+
+  <section id="semantic-search" class="slide"><div>
+      <h2>語意搜尋：怎麼說很像？</h2>
+      <ul>
+        <li>模糊的相似關係必須被量化</li>
+        <li>也許不用很準，最好完全不需要人工標注</li>
+        <li>有沒有辦法把每個 term 定量？\[
+          m(t): t \rightarrow \mathbf{R}^v, t \in \left\{\text{所有可能的中文詞}\right\}
+          \]</li>
+        <li>在 \(\mathbf{R}^v\) 空間能決定兩個詞像不像 \[
+          f(m_1, m_2): \mathbf{R}^v \times \mathbf{R}^v \rightarrow [0, 1]
+        \]</li>
+      </ul>
+  </div></section>
+
+  <section id="word2vec-theory-cbow" class="slide twocol"><div>
+      <div class="left">
+      <h2>Word2vec theory</h2>
+      <ul>
+        <li>一個詞會被轉換到 \(V\) 維度的空間中，\(V \in [200, 1000]\)</li>
+        <li>這個轉換透過給的文本前後文去學習，例如 \( C = 10\) 表示看了前後 5 個字</li>
+        <li>Unsupervised：只要一直餵給他斷好詞的文本就可以了</li>
+        <li>使用 wiki，一次 iteration 後就有效果</li>
+      </ul>
+      </div>
+      <div class="right">
+      <div class="citation">
+        <img src="pics/external/word2vec_cbow.png" alt="">
+        <p>Ref: <a href="http://alexminnaar.com/word2vec-tutorial-part-ii-the-continuous-bag-of-words-model.html">Word2vec tutorial (CBOW)</a></p>
+      </div>
+      </div>
+    </div>
+    <style>
+      #word2vec-theory-cbow.twocol .left {
+        width: 55%;
+      }
+      #word2vec-theory-cbow .citation {
+        position: absolute;
+        top: 100px;
+        right: 75px;
+      }
+      #word2vec-theory-cbow .citation img {
+        width: 380px;
+      }
+    </style>
+  </section>
+
+  <section id="word2vec-space" class="slide twocol"><div>
+    <h2>Word2vec 空間特性</h2>
+    <div class="left">
+      <ul>
+        <li>概念上接近的東西會很接近</li>
+        <li>可能因為他們在文本中經常一起出現、在文本中的位置很接近</li>
+        <li>雖然未必精準（鑰匙、門鎖、門、木板）</li>
+      </ul>
+    </div>
+    <div class="right">
+      <div class="citation">
+        <img style="width: 420px;" src="pics/results/word2vec_space.png" alt="">
+        <p>實際上座標空間有 V 維，這個可以想成映射在某個平面空間時</p>
+      </div>
+    </div>
+  </div></section>
+
+  <section id="word2vec-vector" class="slide twocol"><div>
+    <div class="left">
+      <ul>
+        <li>每個維度大致上控制「某個概念」</li>
+        <li>Unsupervised learning 並無法掌控、指定哪個維度應該是什麼</li>
+        <li>概念可以相加</li>
+        <li>近年 LSTM RNN 這類模型也許可以做得更好，但相較而言， word2vec 架構簡單多了</li>
+      </ul>
+    </div>
+    <div class="right">
+      <div class="citation">
+        <img src="pics/results/word2vec_vector.png" alt="">
+        <p>註：這是很理想的狀況，現實中可能不會這麼理想，相加的概念會被高頻的單字 dominate。例如「○○茶」基本上就是「茶」，除非○○的詞頻夠足以讓 word2vec 的向量夠明確，例如「高山茶」就能與「茶」有所區別；像「伯爵茶」的「伯爵」概念就會被實際的「伯爵」所影響。<br>這時候就需要更精細的斷詞系統。</p>
+      </div>
+    </div>
+  </div></section>
+
+  <section id="word2vec-vector-diff" class="slide twocol-lr"><div>
+    <div class="left">
+    <p>還有一些很有趣的特性</p>
+    <p>\[
+    \begin{align*}
+      &m_{東京} - m_{日本} \\
+      \approx& m_{柏林} - m_{德國}
+    \end{align*}
+    \]</p>
+    <p>因為維基的敘述像「東京是日本的首都」、「柏林是德國的首都」</p>
+    </div>
+    <div class="right">
+      <div class="citation">
+        <img src="pics/external/word2vec_vecdiff.gif" alt="">
+        <p>Ref: <a href="http://google-opensource.blogspot.tw/2013/08/learning-meaning-behind-words.html">Google Open Source Blog</a></p>
+      </div>
+    </div>
+  </div></section>
+
+  <section id="word2vec-wiki" class="slide twocol"><div>
+    <h2 class="tighter">使用中文維基的 word2vec</h2>
+    <div class="left">
+      <pre class="language-python medium"><code>m.most_similar(['項鍊'])
+墜子       	0.798
+項鏈       	0.736
+墜        	0.707
+墜飾       	0.684
+鏈長       	0.682
+鎖骨       	0.681
+鏈        	0.664
+鍊        	0.662
+墬        	0.650
+純銀       	0.649</code></pre>
+    </div>
+    <div class="right">
+      <pre class="language-python medium"><code>m.most_similar(['背包'])
+束口       	0.713
+圓筒       	0.617
+書包       	0.591
+背袋       	0.587
+側        	0.582
+中型       	0.572
+手提包       0.571
+肩背       	0.571
+後背       	0.544
+斜背       	0.539</code></pre>
+    </div>
+  </div></section>
+
+  <section id="word2vec-wiki-contd" class="slide twocol"><div>
+    <div class="left">
+      <pre class="language-python medium"><code>m.most_similar(['高山茶'])
+烏龍茶      	0.722
+阿里山      	0.715
+茶        	0.708
+蜜香       	0.685
+金萱       	0.683
+包種茶      	0.681
+紅茶       	0.681
+高山       	0.677
+烏龍       	0.675
+茶農       	0.670</code></pre>
+    </div>
+    <div class="right">
+      <pre class="language-python medium"><code>m.most_similar(['高山', '茶'])
+阿里山      	0.837
+烏龍       	0.818
+烏龍茶      	0.795
+紅茶       	0.794
+金萱       	0.786
+茶葉       	0.769
+高山茶      	0.765
+綠茶       	0.752
+茶園       	0.742
+手採       	0.741</code></pre>
+    </div>
+  </div></section>
+
+  <section id="word2vec-wiki-examples" class="slide twocol"><div>
+      <div class="left">
+      <pre class="language-python medium"><code>m.most_similar(['白毫', '烏龍'])
+烏龍茶      	0.861
+金萱       	0.809
+凍頂       	0.804
+紅茶       	0.788
+綠茶       	0.780
+阿里山       0.779
+蜜香       	0.763
+青心       	0.759
+甘潤       	0.747
+東方美人茶    0.744</code></pre>
+      </div>
+      <div class="right">
+      <pre class="language-python medium"><code>m.most_similar(['藍色'])
+綠色       	0.870
+紫色       	0.862
+黃色       	0.851
+粉色       	0.827
+紅色       	0.814
+桃紅色      	0.798
+橘色       	0.794
+藍        	0.785
+白色       	0.767
+淺        	0.766</code></pre>
+      </div>
+  </div></section>
+
+  <section id="word2vec-wiki-examples-otaku" class="slide twocol"><div>
+      <div class="left">
+      <pre class="language-python medium"><code>m.most_similar(['涼宮', '春日'])
+朝比奈實     	0.660
+小涼宮      	0.653
+有希       	0.635
+虛妹       	0.630
+nyoron   	0.593
+阿虛       	0.592
+小鶴屋      	0.583
+喜綠江      	0.574
+屋學       	0.564
+實玖瑠的     	0.559</code></pre>
+      </div>
+      <div class="right">
+      <pre class="language-python medium"><code>m.most_similar(['玲音'])
+狼雨       	0.564
+texhnolyze	0.561
+flcl     	0.558
+clamp    	0.542
+沙羅鬼      	0.539
+寶魔       	0.535
+亡念       	0.534
+碧奇魂      	0.527
+chobits  	0.526
+蟲師       	0.526</code></pre>
+      </div>
+      <div class="sidenote grey"><p>FYI: <a href="http://knowyourmeme.com/memes/nyoron">nyoron</a>、<a href="https://en.wikipedia.org/wiki/Texhnolyze">texhnolyze</a><br>wiki 很宅der</p></div>
+    </div>
+    <style>
+      #word2vec-wiki-examples-otaku .sidenote p {
+        margin-bottom: 5px;
+        line-height: 1.5em;
+        text-align: right;
+      }
+      #word2vec-wiki-examples-otaku .sidenote {
+        position: absolute;
+        width: 300px;
+        right: 120px;
+        bottom: 25px;
+        line-height: 1.5em;
+        font-size: 20px;
+        padding: 0 10px;
+      }
+    </style>
+  </section>
+
+  <section id="word2vec-wiki-examples-country" class="slide twocol"><div>
+      <div class="left">
+      <p>在論文上看得到的比較</p>
+      <pre class="language-python medium"><code>紐約 - 美國 = ? - 英國
+倫敦       	0.837
+逛        	0.817
+一線       	0.816
+
+北京 - 中國 = ? - 德國
+柏林       	0.792
+榮獲       	0.762
+旅德       	0.746</code></pre>
+      </div>
+      <div class="right">
+      <p>WTF 系列</p>
+      <pre class="language-python medium"><code>宅男 - 男生 = ? - 女生
+正妹       	0.836
+宅女       	0.829
+宅男女神     	0.823
+
+腐女 - 女生 = ? - 男生
+御宅族      	0.779
+傲嬌       	0.750
+yaoi     	0.749</code></pre>
+      </div>
+  </div></section>
+
+  <section id="prod-semantic-search" class="slide twocol"><div>
+      <h2>使用 word2vec 在搜尋</h2>
+      <div class="left">
+        <ul>
+          <li>即便在字串搜尋的情況沒有結果，仍然能找它相近的</li>
+          <li>word2vec 使用 <a href="https://radimrehurek.com/gensim/">gensim</a> 實作</li>
+          <ul>
+            <li>尚末支援加新詞的功能。<br>意即，新文本中的新詞會自動被忽略而沒有 mapping</li>
+            <li>本功能尚在 <a href="https://github.com/piskvorky/gensim/pull/435">pull request</a> 中</li>
+          </ul>
+        </ul>
+      </div>
+      <div class="right">
+        <div class="citation">
+          <img style="width: 120%; height: 120%;" src="pics/results/word2vec_similar_search.png" alt="">
+        </div>
+      </div>
+  </div></section>
+
+  <section id="prod-demo-search-suggest" class="slide"><div>
+      <h2>Demo</h2>
+    <img style="width: 100%; top: 360px;" class="place" src="pics/results/prod_search_suggestiong_demo.png" alt="">
+  </div></section>
+
+  <section id="prod-demo-search-similar" class="slide twocol-lr"><div>
+      <div class="left">
+        <h2>Demo 2</h2>
+        <p class="pinkoi">🔍 寬肩點點連身洋裝</p>
+        <ul>
+          <li>大點點罩衫洋裝</li>
+          <li>雙色點點棉洋裝</li>
+          <li>點點蝴蝶結背心長洋裝</li>
+          <li>長長背心裙洋裝</li>
+          <li>點點洋裝</li>
+        </ul>
+      </div>
+      <div class="right">
+        <div class="citation">
+          <img src="pics/results/pinkoi_1M9o7QN4.jpg" alt="">
+          <img src="pics/results/pinkoi_1muFWiOp.jpg" alt="">
+          <p>圖左：<a href="http://www.pinkoi.com/product/1M9o7QN4">設計師：turn turn</a> | 圖右：<a href="http://www.pinkoi.com/product/1M9o7QN4">設計師：y1,hsuan</a></p>
+        </div>
+      </div>
+    </div>
+    <style>
+      #prod-demo-search-similar .right img {
+        width: 250px;
+      }
+    </style>
+  </section>
+
+  <section id="word2vec-summary" class="slide"><div>
+      <h2>Word2vec 總結</h2>
+      <ul>
+        <li>我們的出發點：改善找不（太）到東西的那群人</li>
+        <li>但 word2vec 提供一個簡單、有效的語意 feature</li>
+        <li>也許不是最準的 / 用的模型也是最簡單的</li>
+        <li>靠 benchmark、行為分析來判斷是否需要改進</li>
+      </ul>
+  </div></section>
+
+  <section id="not-the-best-way" class="slide"><div>
+      <h2>今天用的未必是最好的方法</h2>
+      <p>「咦你剛剛說用△△△，但那不是………為什麼不用○○○效果更好」</p>
+      <ul>
+        <li>因為△△△能動，而且效果能接受，就沒繼續做下去了</li>
+        <li>簡單的方法能動就用簡單的</li>
+        <li>用兩成的工完成六成的效果</li>
+        <li>也不要一開始就想到 big data、deep learning</li>
+      </ul>
+  </div></section>
+
+  <section id="pinkoi-whats-next" class="slide"><div>
+      <h2>What's next for <img class="logo" src="pics/pinkoi.png" alt="Pinkoi"> ?</h2>
+      <ul>
+        <li>アジア最大級のハンドメイド、デザイン商品販売サイトです。</li>
+        <li>Asia's largest online marketplace for unique and original design goods.</li>
+        <li>นเว็บไซต์ซื้อขายงานดีไซน์ออนไลน์ที่ใหญ่ที่สุดในเอเชีย</li>
+        <li>亚洲领先的设计商品购物网站</li>
+      </ul>
+      <p class="pinkoi">我們關心並努力改善來自各地的使用者體驗</p>
+    </div>
+    <style>
+      #pinkoi-whats-next .logo {
+        width: 1.5em;
+        height: 1.5em;
+        vertical-align: bottom;
+      }
+    </style>
+  </section>
+
+  <section id="pinkoi-hiring" class="slide cover"><div>
+      <img src="pics/pinkoi_hiring.jpg" alt="" />
+      <h2><a href="http://www.pinkoi.com/about/pinkoist"><img src="pics/pinkoi.png" alt="Pinkoi"></a>is hiring</h2>
+      <p class="job">Back-End | QA | Data | Search<br>Front-End | iOS | Android</p>
+  </div>
+  <style>
+    #pinkoi-hiring div > img {
+      opacity: 0.9;
+      width: 100%;
+    }
+    #pinkoi-hiring h2 img {
+      vertical-align: middle;
+      position: relative;
+      height: 1.8em;
+      margin-right: 0.1em;
+    }
+    #pinkoi-hiring h2 a {
+      background: none;
+    }
+    #pinkoi-hiring h2 {
+      color: #eee;
+      position: absolute;
+      font-size: 130px;
+      bottom: 80px;
+      right: 30px;
+    }
+    #pinkoi-hiring p {
+      position: absolute;
+      text-align: right;
+      color: #eee;
+    }
+    #pinkoi-hiring .job {
+      font-size: 24px;
+      line-height: 1.5em;
+      bottom: 50px;
+      right: 35px;
+    }
+  </style>
+  </section>
+
+
+  <!-- End Slide -->
+  <section id='end' class='slide cover shout w'><div>
+      <h2>Questions?</h2>
+      <img src="pics/end.jpg" alt="">
+    </div>
+    <style>
+      #end h2 {
+        position: absolute;
+        text-align: right;
+        top: auto;
+        left: auto;
+        bottom: -40px;
+        right:0px;
+        padding-right: 60px;
+        color: #ECCB15;
+        text-shadow: 1px 2px 5px #111;
+        font-size: 140px;
+        opacity: 0.95;
+      }
+    </style>
+  </section>
+
+  <section id="misc-cover" class="slide cover w subheader mid"><div>
+      <h2>Misc. Topics</h2>
+      <p>以下言論不代表<br>公司立場 XD</p>
+      <img src="pics/mid.jpg" alt="">
+    </div>
+    <style>
+      #misc-cover p {
+        position: absolute;
+        bottom: 50px;
+        right: 60px;
+        text-align: right;
+        color: #EEE;
+        width: 400px;
+        font-size: 48px;
+        line-height: 1.4em;
+      }
+    </style>
+  </section>
+
+  <section class="slide twocol-lr"><div>
+      <div class="left">
+        <h2>高記憶體<br>用量調整</h2>
+        <ul>
+          <li>gensim 拿 w2v 機制</li>
+          <li>加上自己的 model 可能就需要占用 4GB 以上記憶體</li>
+          <li>load 4GB 記憶也讓 service 啟動時間變長</li>
+        </ul>
+      </div>
+      <div class="right">
+        <div class="citation">
+        <img src="pics/results/word2vec_mem-01.png" alt="">
+        </div>
+      </div>
+  </div></section>
+
+  <section class="slide twocol-lr"><div>
+      <div class="left">
+        <h2>Disk caching</h2>
+        <ul>
+          <li>用 database？還沒試</li>
+          <li>有個 library 叫 <a href="https://www.hdfgroup.org/HDF5/">HDF5</a></li>
+          <li>不是 HDFS</li>
+          <li>大型矩陣存取</li>
+          <li>實測效能沒問題</li>
+          <li>省了近 2GB RAM</li>
+        </ul>
+      </div>
+      <div class="right">
+        <div class="citation">
+        <img src="pics/results/word2vec_mem-02.png" alt="">
+        </div>
+      </div>
+  </div></section>
+
+  <section id="pycontw-2016" class="slide cover h"><div>
+      <img src="pics/pycontw2016.png" alt="">
+  </div></section>
+
+  <section id="my-future-goal" class="slide"><div>
+      <blockquote class="place c cjk" lang="en"><p lang="zh" dir="ltr">以前 COSCUP 結束後，會眾紛紛撰寫網誌，紀錄一年一度的盛會，現在參與人數這麼多，實際紀錄的人卻更少，而且鮮少是著墨議題本身，反過來說，日本朋友紀錄的內容還比台灣會眾清楚 (?)</p>&mdash; Jim Huang (@jserv) <a href="https://twitter.com/jserv/status/634150416171687936">August 19, 2015</a></blockquote>
+  </div></section>
+
+  <section id="in-the-future-we-trust" class="slide"><div>
+      <figure>
+        <blockquote class="cjk">
+          <p>　　會成為勇敢、強壯而溫柔的人嗎？會成為絕頂聰明，卻憤世嫉俗的人嗎？或者，會像絕大多數的人一樣，成為一個專業、庸俗、社會化完全的「大人」？我們自少年時極力奮鬥的，不就是要抗拒這樣的馴化，拒絕體制將我們抹壓成同一張臉孔？……<br>
+            　　……我希望他們每個人都能從青春裡直接長成正直而勇敢的大人。能不能不要忘記我們曾經衝撞過的理想，流的眼淚，對共同體的愛，為彼此寫的詩，把那種熱情和感動在長長的歲月裡捶打成綿長不絕的，日夜不竭的，為台灣這塊土地的奮鬥？<br><span class="author">&mdash; 許菁芳。<a href="http://chingfanghsu.blogspot.ca/2014/11/the-ntu-brothers.html">《The NTU Brothers / 台大男生》</a></span></p>
+        </blockquote>
+      </figure>
+  </div></section>
+
+
+  <!-- END OF SLIDE CONTENT -->
+  <p class="badge"><a href="https://github.com/ccwang002/2015Talk-Chinese-Search" target="_blank">Fork me on Github</a></p>
+  <div class="progress"><div></div></div>
+
+  <!-- Library -->
+  <script src="lib/highlight/highlight.pack.js" type="text/javascript" charset="utf-8"></script>
+  <script>
+    hljs.initHighlightingOnLoad();
+  </script>
+  <script src="lib/shower/shower.min.js"></script>
+  <!-- Mathjax -->
+  <!-- During local development, use localhost mathjax for speed-->
+  <!--<script src="file:///Users/liang/.ipython/profile_default/static/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>-->
+  <!-- online Mathjax CDN -->
+  <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>
